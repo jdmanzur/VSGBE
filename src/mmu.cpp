@@ -7,6 +7,20 @@
 //TODO:Verificar e tratar exceções
 Mmu::Mmu(uint8_t* bios_a, uint8_t* rom_a, uint32_t rom_s)
 {
+    //Decofica os dados do cabeçalho da ROM
+    readROMHeader(rom_a);
+
+    //Inicializa modo de operação do MBC
+    if(this->c_type == MBC1)
+        //Inicializa no modo 16Mbit de ROM/8KByte de RAM
+        this->mbc1_t = 0;
+
+    //Aloca memória para bancos de ROM
+    this->b_rom = new uint8_t[rom_s - ROM_BANK_SIZE];
+
+    //Aloca memória para os bancos de RAM
+    if(this->ram_size > 0)
+        this->b_ram = new uint8_t[this->ram_size];
 
     //Carrega a bios
     for(int i = 0; i < BIOS_SIZE; i++)
@@ -23,6 +37,9 @@ Mmu::Mmu(uint8_t* bios_a, uint8_t* rom_a, uint32_t rom_s)
 
     //Coloca a BIOS como primeira página
     this->fst_page = this->bios;
+
+    //Seleciona o primeiro banco de ROM
+    this->rom_sel = 0;
 
 
 }
@@ -78,7 +95,7 @@ uint8_t Mmu::read(uint16_t addr)
     //Banco de ROM selecionável
     else if((addr >= ROMX)&&(addr < VRAM))
     {
-        return this->b_rom[(addr - ROMX)];
+        return this->b_rom[(addr - ROMX)+(this->rom_sel * ROM_BANK_SIZE)];
     }
     //Video RAM
     else if ((addr >= VRAM)&&(addr < RAMX))
@@ -88,6 +105,11 @@ uint8_t Mmu::read(uint16_t addr)
     //Banco de RAM Externa selecionável
     else if((addr >= RAMX)&&(addr < RAM0))
     {
+
+        //Verfica se há RAM externa presente
+        if(this->ram_size > 0)
+            return this->b_ram[(addr - RAMX) + (RAM_BANK_SIZE * ram_sel)];
+
         return 0;
     }
     //Banco 0 de RAM interna
@@ -114,20 +136,51 @@ void Mmu::write(uint16_t addr,uint8_t data)
 {
     //Verifica qual região da RAM está sendo acessada
 
-    //BIOS e Vetores de inteuupção
-    if(addr < BIOS_SIZE)
+    //Habilita RAM externa
+    if(addr < 0x2000)
     {
+
 
     }
-    //Banco #0 da ROM 
-    else if((addr >= BIOS_SIZE)&&(addr < ROMX))
+    //Seleção de banco de ROM
+    else if((addr >= 0x2000)&&(addr < 0x4000))
     {
+
+
+        //Caso controlador de memória estiver presente muda o banco de ROM
+        if(this->c_type == MBC1)
+        {
+            uint16_t bank = (data & 0x1F);
+
+            //O controlador não suporta o mapeamento do banco 0
+            if(bank == 0)
+                bank++;
+
+            this->rom_sel = (bank - 1);
+        }
+
 
     }
-    //Banco de ROM selecionável
-    else if((addr >= ROMX)&&(addr < VRAM))
+    //Banco de RAM selecionável
+    else if((addr >= 0x4000)&&(addr < 0x6000))
     {
+        //Caso controlador de memória estiver presente muda o banco de RAM
+        if(this->c_type == MBC1)
+        {
+            if(mbc1_t == 1)
+                this->ram_sel = ((data & 0x03) - 1);
+            else
+                this->rom_sel = ((data & 0x03) << 5);
+            
+        }
 
+    }
+    //Modo de operação do MBC
+    else if ((addr >= 0x6000)&&(addr < 0x8000))
+    {
+        //Seleciona modo de operação do controlador de memória
+        mbc1_t = (data & 0x01);
+       
     }
     //Video RAM
     else if ((addr >= VRAM)&&(addr < RAMX))
@@ -137,6 +190,9 @@ void Mmu::write(uint16_t addr,uint8_t data)
     //Banco de RAM Externa selecionável
     else if((addr >= RAMX)&&(addr < RAM0))
     {
+        //Verfica se há RAM externa presente
+        if(this->ram_size > 0)
+            this->b_ram[(addr - RAMX) + (RAM_BANK_SIZE * ram_sel)] =  data;
 
     }
     //Banco 0 de RAM interna

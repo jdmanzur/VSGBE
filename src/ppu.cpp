@@ -344,21 +344,21 @@ void Ppu::update(uint8_t e_clk)
         //Flag para o controlador de vídeo 
         uint8_t lcd_on = (((*mem).read(LCDC) & 0x80) >> 6);
 
+        //Atualiza o clock
+	this->incClk(e_clk);
+
+        //Linha anterior
+        int old_line = this->line;
+
+        //Atualiza o No da linha
+        this->line = (this->clk / 456);
+
         //Verifica se vídeo está ativo
         if(lcd_on)
 	{
 
-		//Atualiza o clock
-		this->incClk(e_clk);
-
-                //Linha anterior
-                int old_line = this->line;
-
-		//Atualiza o No da linha
-                this->line = (this->clk / 456);
-
 		//Atualiza o background, caso esteja habilitado  
-		if(bg_on && (this->line != old_line))
+		if((this->line != old_line))
                 { 
                         //this->line = new_line;
                         

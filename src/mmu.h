@@ -2,6 +2,7 @@
 #define MMU_H_
 
 #include <iostream>
+#include <SDL2/SDL.h>
 #include <cstdint>
 #include "ioRegAddr.h"
 
@@ -49,7 +50,7 @@ private:
 
 	//Ponteiro para o banco de ROM selecionável
 	//uint8_t* b_rom;
-	uint8_t b_rom[ROM_BANK_SIZE];
+	uint8_t* b_rom;
 
 	//Ponteiro para o banco de RAM selecionável
 	uint8_t* b_ram;
@@ -72,16 +73,16 @@ private:
 	uint8_t mbc1_t;
 
 	//Número total de bancos de ROM
-	uint8_t n_rom;
+	uint16_t n_rom;
 
 	//Número total de bancos de ROM
-	uint8_t n_ram;
+	uint16_t n_ram;
 
 	//Banco de ROM selecionado
-	uint8_t rom_sel;
+	uint16_t rom_sel;
 
 	//Banco de RAM selecionado
-	uint8_t ram_sel;
+	uint16_t ram_sel;
 
 
 	//Classe que faz a intermediação de escrita nos endereços de memória

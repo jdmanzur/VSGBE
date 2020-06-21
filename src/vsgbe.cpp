@@ -10,6 +10,7 @@
 #include <fstream>
 #include <cstdint>
 #include <SDL2/SDL.h>
+#include <assert.h>
 #include "mmu.h"
 #include "cpu.h"
 #include "appInit.h"
@@ -20,24 +21,27 @@ using namespace std;
 
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
 	//Variáveis temporárias para ram e bios
-
 
 	//Carrega a bios e a rom
 	//loadBios((char*)bios);
 	//loadROM((char*)rom);
 
+	assert(argc >= 3);
+
+	SDL_Event e;
+
 	//Local da bios
-	char bios_l[] = "/home/adriano/Documentos/gb/bios.gb";
+	//char bios_l[] = "/home/adriano/Documentos/gb/bios.gb";
 
 	//Local da rom
-	char rom_l[] = "/home/adriano/Documentos/gb/tetris.gb";
+	//char rom_l[] = "/home/adriano/Documentos/gb/tetris.gb";
 
 	//Horrível, melhorar
-	uint8_t* bios = new uint8_t[getFilesize(bios_l)];
-	uint8_t* rom =  new uint8_t[getFilesize(rom_l)];
+	uint8_t* bios = new uint8_t[getFilesize(argv[1])];
+	uint8_t* rom =  new uint8_t[getFilesize(argv[2])];
 	//uint8_t* bios = (uint8_t*)malloc(getFilesize(bios_l)*sizeof(uint8_t));
 	//uint8_t* rom =  (uint8_t*)malloc(getFilesize(rom_l)*sizeof(uint8_t));
 
@@ -46,17 +50,17 @@ int main() {
 	//uint8_t rom[32768];
 
 	//Carrega a ROM e a BIOS
-	loadBiosROM(bios_l,rom_l,(char*)bios,(char*)rom);
+	loadBiosROM(argv[1],argv[2],(char*)bios,(char*)rom);
 
 	//Objeto Espaço de memória
 	//Mmu ram(bios,rom,getFilesize(rom_l));
-	Mmu ram(rom);
+	Mmu ram(bios,rom,getFilesize(argv[2]));
 
 
 
 	//Librera a ram
-	delete [] bios;
-	delete [] rom;
+	//delete [] bios;
+	//delete [] rom;
 
 
 	//Carrega o espaço de memória
@@ -69,7 +73,7 @@ int main() {
 	Ppu ppu(&ram);
 
 	//Instância da Entardas
-	InputCrt entrada(&ram);
+	InputCrt entrada(&ram,&e);
 
 /*	for(int i = 0; i < 256; i++)
 		cout << hex << (int)ram[i] << endl;
@@ -99,7 +103,7 @@ int main() {
 	ram[0xFF05] = 0x00;
 	ram[0xFF04] = 0x00;
 
-	cpu.reg_file.PC = 0x100;
+	//cpu.reg_file.PC = 0x100;
 
 	while(fim)
 	{
@@ -108,13 +112,13 @@ int main() {
 
 
 		//cout << "Istru: "<< hex << cpu.reg_file.PC << endl;
-		//cout << " LY: " << hex << (int)ram[0xFF44] << endl;
+		//cout << " STAT: " << hex << (int)ram[0xFF41] << endl;
 
 		//Rotina para enganar o programa e dizer que os botões não estão apetados
-		if((cpu.reg_file.PC == 0x00FE))
+		if((cpu.reg_file.PC == 0x97))
 		{
 			//Zera todos os botões 
-			//ram[0xFF80] = 0x00;
+			ram[0xFF80] = 0x00;
 		}	
 
 		//Atualiza o clock da PPU
@@ -127,11 +131,15 @@ int main() {
 		ram.write(0xFF05,(ram.read(0xFF05) + cpu.getClkElapsed()));
 		ram.write(0xFF04,(ram.read(0xFF04) + cpu.getClkElapsed()));
 
+		//Zera todos os botões 
+		//ram[0xFF80] = 0x00;
+
 		//Verifica se o usuário desligou
 		fim = (!entrada.app_quit);
 
 
 	}
+
 
 	return 0;
 }

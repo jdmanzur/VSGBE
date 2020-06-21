@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/vsgbe",
-            "args": [],
+            "args": ["/home/adriano/Documentos/gb/bios.gb","/home/adriano/Documentos/gb/Dragon Slayer I (J).gb"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -34,7 +34,7 @@ Video::Video(int width,int height)
         //Buffer para atualizar o backgorund
         //TODO: Remover Números mágicos
         //this->BG_buff = [0x7F007F00 for pixel in range(23040)]
-        for(uint64_t x = 0; x < 22400; x++)
+        for(uint64_t x = 0; x < 30000; x++)
             this->BG_buff[x] = 0x007F007F;
 
         this->fps_lasttime = SDL_GetTicks();

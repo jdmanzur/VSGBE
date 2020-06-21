@@ -14,7 +14,7 @@ private:
     Mmu* mem;
 
     //Variável de eventos para SDL
-    SDL_Event input_e;
+    SDL_Event* input_e;
 
 public:
 
@@ -22,7 +22,7 @@ public:
     bool app_quit;
 
     //Construtor
-    InputCrt(Mmu *mem_s);
+    InputCrt(Mmu *mem_s,SDL_Event* e);
 
     //Destrutor
     ~InputCrt();

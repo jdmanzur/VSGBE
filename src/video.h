@@ -32,7 +32,8 @@ private:
 
     //Buffer para guardar os dados da textura
     //TODO: Remover Números mágicos
-    uint32_t BG_buff[22400];
+    //uint32_t BG_buff[22400];
+    uint32_t BG_buff[30000];
 
     //Variaveis para se medir o framerate
     uint32_t fps_lasttime;

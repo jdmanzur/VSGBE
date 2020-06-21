@@ -2,17 +2,19 @@
 #include <assert.h>
 
 //Construtor
-InputCrt::InputCrt(Mmu *mem_s)
+InputCrt::InputCrt(Mmu *mem_s,SDL_Event* e)
 {
     //Configura ponteiro para espaço de memória
     this->mem = mem_s;
+
+    this->input_e = e;
 
     //Variável para indicar se usuário quer sair do programa
     this->app_quit = 0;
 
     //Inicializa os eventos do SDL
-    if(SDL_Init(SDL_INIT_EVENTS) != 0);
-        assert("Erro");
+   //if(SDL_Init(SDL_INIT_EVENTS) < 0);
+   assert(SDL_Init(SDL_INIT_EVENTS) >= 0);
 
 
 
@@ -32,12 +34,13 @@ void InputCrt::UpdateAppUI()
 
     //Atualiza os eventos
     //TODO: Colocar um Timer para melhor a velocidade do programa
-    while ((SDL_PollEvent(&input_e)) != 0)
-        if (input_e.type == SDL_QUIT) 
+    while ((SDL_PollEvent(input_e)) != 0)
+        if ((*input_e).type == SDL_QUIT) 
         {
             this->app_quit = 1;
             std::cout << "Sair...." << std::endl;
         }
+
     //Leitura do estados da teclas
     const uint8_t* key_state = SDL_GetKeyboardState(NULL);
 
