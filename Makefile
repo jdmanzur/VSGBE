@@ -1,5 +1,5 @@
 CC=g++
-EXECUTABLE=vsgbe
+EXECUTABLE=vsgbe.out
 SOURCES=$(wildcard src/*.cpp)
 INCLUDE="/usr/include/SDL2/"
 OBJS=$(SOURCES: .cpp=.o)
