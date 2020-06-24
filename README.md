@@ -1,23 +1,25 @@
-MMMMMMMMMMMMMMK: .dWMW0l,.....,cd0NMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMNo  :XMWx. .;lddoc,..'dXMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-MWWMMMMMMMMMMk. 'OMMX;  :XMMMMMWKx;:0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-x:oXMMMMMMMMK; .dWMMX:  ;0MMMMMMMMWNWMMMMMWX0xdxk0KXWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-. .oNMMMMMMWo  cXMMMM0;  .cx0NWMMMMMMMMMMXo'    ....,lkXWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOl
-d. .xWMMMMMO. '0MMMMMMXk:.  .':oONMMMMMMXc  .:xkkxdoc'..:kNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMN0o,.,
-Nl  .OMMMMX: .xWMMMMMMMMWXOdc,. .,dXMMMMx. .oNMMMMMMMN0o,.,xNMMMMWWWMMMMMMMMMMMMMMMMMMMMMMWKkl,..ckN
-MX:  ,0MMWo. lNMMMMMMMMMMMMMMWKx;  ,OWMWo  ,KMMMMMMMMMMMNx,;0MMMM0c:ldkOKXNWMMMMMMMMMMWKdc,..'cxXWMM
-MM0,  :XMO. ,KMMMMMMMMMMMMMMMMMMNo. ,0MWo  :XMMMMMMMMMMMMMX0XMMMMk.  .....';coONMMMMMMNc  'oOXWMMMMW
-MMMO.  l0: .kWMMMMMMNxlxKNMMMMMMMO. .xMMx. ;KMMMMMMMWWWMMMMMMMMMMk. 'x0Oxdl;.  ,kWMMMMNc  lWMMMWXkcl
-MMMWx. ... lNMMMMMMMNl...,coxkOkx;  .kMMK; .kMMMMMMMk;:okKNMMMMMMk. '0MMMMMWKc  .OMMMMNc  lWWXkc'.,d
-MMMMNo.   ;KMMMMMMMMMNKkdc,.....   'dNMMWk. :XMMMMMMKo;...,l0WMMMk. '0MMMMMMMk. .kMMMMNc  ;d:'.;oONM
-MMMMMXl';oKMMMMMMMMMMMMMMMWNK0OkkkOXWMMMMWx. :KWMMMMMMWXO;  oWMMMk. .;loxkOOd,  cXMMMMNc   .;d0NMMMM
-MMMMMMWNWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMW0;..oKWMMMMMMWl  oWMMMk. .''....   .dXMMMMMNc  ;0WMMMMMMM
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNx;..:od0XWMWl  oWMMMk. '0WXK0kdc'..lKWMMMNc  lWMMMMMNOo
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNOo,....,::.  oWMMMk. '0MMMMMMMK:  ;KMMMNc  lWMMNOl,.'
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWNKkoc;,',:OWMMMx. '0MMMMMMMMx. .kMMMNc  lKkl,';oOX
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWWNWWMMMMMk. .xKXNWMMWK:  '0MMMNc  .,,cxKWMMM
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM0:.....';::;.  ,kWMMMNl.,lOXWMMMMMM
-MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNX0xl;..    'oKMMMMMW0ONMMMMMMMMMM
+          _____                    _____                    _____                    _____                    _____          
+         /\    \                  /\    \                  /\    \                  /\    \                  /\    \         
+        /::\____\                /::\    \                /::\    \                /::\    \                /::\    \        
+       /:::/    /               /::::\    \              /::::\    \              /::::\    \              /::::\    \       
+      /:::/    /               /::::::\    \            /::::::\    \            /::::::\    \            /::::::\    \      
+     /:::/    /               /:::/\:::\    \          /:::/\:::\    \          /:::/\:::\    \          /:::/\:::\    \     
+    /:::/____/               /:::/__\:::\    \        /:::/  \:::\    \        /:::/__\:::\    \        /:::/__\:::\    \    
+    |::|    |                \:::\   \:::\    \      /:::/    \:::\    \      /::::\   \:::\    \      /::::\   \:::\    \   
+    |::|    |     _____    ___\:::\   \:::\    \    /:::/    / \:::\    \    /::::::\   \:::\    \    /::::::\   \:::\    \  
+    |::|    |    /\    \  /\   \:::\   \:::\    \  /:::/    /   \:::\ ___\  /:::/\:::\   \:::\ ___\  /:::/\:::\   \:::\    \ 
+    |::|    |   /::\____\/::\   \:::\   \:::\____\/:::/____/  ___\:::|    |/:::/__\:::\   \:::|    |/:::/__\:::\   \:::\____\
+    |::|    |  /:::/    /\:::\   \:::\   \::/    /\:::\    \ /\  /:::|____|\:::\   \:::\  /:::|____|\:::\   \:::\   \::/    /
+    |::|    | /:::/    /  \:::\   \:::\   \/____/  \:::\    /::\ \::/    /  \:::\   \:::\/:::/    /  \:::\   \:::\   \/____/ 
+    |::|____|/:::/    /    \:::\   \:::\    \       \:::\   \:::\ \/____/    \:::\   \::::::/    /    \:::\   \:::\    \     
+    |:::::::::::/    /      \:::\   \:::\____\       \:::\   \:::\____\       \:::\   \::::/    /      \:::\   \:::\____\    
+    \::::::::::/____/        \:::\  /:::/    /        \:::\  /:::/    /        \:::\  /:::/    /        \:::\   \::/    /    
+     ~~~~~~~~~~               \:::\/:::/    /          \:::\/:::/    /          \:::\/:::/    /          \:::\   \/____/     
+                               \::::::/    /            \::::::/    /            \::::::/    /            \:::\    \         
+                                \::::/    /              \::::/    /              \::::/    /              \:::\____\        
+                                 \::/    /                \::/____/                \::/____/                \::/    /        
+                                  \/____/                                           ~~                       \/____/         
+                                                                                                       
 
 Um emulador ruim de GameBoy
 
