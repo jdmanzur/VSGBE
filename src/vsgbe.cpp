@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 
 
 	//Librera a ram
-	//delete [] bios;
-	//delete [] rom;
+	delete [] bios;
+	delete [] rom;
 
 
 	//Carrega o espaço de memória
@@ -111,8 +111,10 @@ int main(int argc, char *argv[]) {
 		cpu.runInstruction();
 
 
-		//cout << "Istru: "<< hex << cpu.reg_file.PC << endl;
-		//cout << " STAT: " << hex << (int)ram[0xFF41] << endl;
+		uint16_t pc = cpu.reg_file.PC;
+
+		//cout << "PC: "<< hex << pc << " Intru: " << (int)ram[pc]  <<  endl;
+		//cout << "B: " << hex << (int)cpu.reg_file.B() << endl;
 
 		//Rotina para enganar o programa e dizer que os botões não estão apetados
 		if((cpu.reg_file.PC == 0x97))

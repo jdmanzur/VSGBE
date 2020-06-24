@@ -1,0 +1,23 @@
+#Pasta do VSCode
+.vscode/
+
+#Pasta de configurações
+.settings/
+
+#Misc
+.cproject
+.project
+
+#Ignora a Pasta de teste
+test/
+
+#Ignora o aplicativo compilado
+*.exe
+*.out
+*.app
+
+# Objetos Compilados
+*.slo
+*.lo
+*.o
+*.obj
