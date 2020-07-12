@@ -635,31 +635,33 @@ void SimpleZ80::daa(uint8_t* opcode)
 	this->reg_file.clrFlagBit(z);
 
 	//Verifica o resultado da operação anterior
-	if(this->reg_file.getFlagBit(n))
+	if(!this->reg_file.getFlagBit(n))
 	{
 
-		//Verifica a parte baixa
-		if (h_old || (al > 9))
-			this->reg_file.A() += 0x06;
-
 		//Verifica a parte alta
-		if(c_old || (ah > 9) || ((ah == 9) || (al > 9)))
+		if(c_old || (this->reg_file.A() > 0x99))
 		{
 			this->reg_file.A() += 0x60;
 			this->reg_file.setFlagBit(c);
 		}
+
+		//Verifica a parte baixa
+		if (h_old || ((this->reg_file.A() & 0x0F) > 9))
+			this->reg_file.A() += 0x06;
+
+
 	}
 	else
 	{
 
 		//Verifica a parte baixa
-		if(h_old && (al > 5))
-			this->reg_file.A() = ((this->reg_file.A() - 0x06) & 0xFF);
+		if(h_old)
+			this->reg_file.A() -= 0x06;
 
 		//Verifica a parte alta
-		if(c_old && (ah > 6 || (h_old && (ah > 5))))
+		if(c_old)
 		{
-			this->reg_file.A() = ((this->reg_file.A() - 0x60) & 0xFF);
+			this->reg_file.A() -= 0x60;
 			this->reg_file.setFlagBit(c);
 
 		}
