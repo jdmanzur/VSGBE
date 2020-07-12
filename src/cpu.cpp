@@ -384,15 +384,15 @@ void SimpleZ80::ldhlr16(uint8_t* opcode)
 	uint8_t reg = (opcode[0] & 0x30) >> 4;
 
 	//Verifica o half carry
-	if((this->reg_file.HL()&0xFF ) + (this->reg_file.reg16[reg]&0xFF) >= 0x100)
+	if(((this->reg_file.HL()&0xFFF ) + (this->reg_file.reg16[reg]&0xFFF)) >= 0x1000)
 		this->reg_file.setFlagBit(h);
+
+	//verifica o carry
+	if((uint32_t)(this->reg_file.HL() + this->reg_file.reg16[reg]) > 0xFFFF)
+		this->reg_file.setFlagBit(c);
 
 	//Efetua a soma
 	this->reg_file.HL() += this->reg_file.reg16[reg];
-
-	//verifica o carry
-	if(this->reg_file.HL() < this->reg_file.reg16[reg])
-		this->reg_file.setFlagBit(c);
 
 	//Atualiza o contador de programa
 	this->reg_file.PC += 1;
@@ -517,7 +517,7 @@ void SimpleZ80::rla(uint8_t* opcode)
 	this->reg_file.F() = 0;
 
 	//Verifica o primeiro bit para overflow
-	if (this->reg_file.A() & 0x07)
+	if (this->reg_file.A() & 0x80)
 		//Seta o flag
 		this->reg_file.setFlagBit(c);
 
@@ -525,8 +525,7 @@ void SimpleZ80::rla(uint8_t* opcode)
 	this->reg_file.A() = (this->reg_file.A() << 1);
 
 	//Copia o carry para bit 7
-	this->reg_file.A() |= //Copia o carry para bit 7
-		this->reg_file.A() |= c_old;
+	this->reg_file.A() |= c_old;
 
 	//Atualiza o contador de programa
 	this->reg_file.PC += 1;
@@ -804,11 +803,14 @@ void SimpleZ80::ccf(uint8_t* opcode)
 
 	//TODO: Melhorar esse código
 
+	//Variavel temporária
+	bool c_old = this->reg_file.getFlagBit(c);
+
 	//Atualiza os flags
 	this->reg_file.F() &= 0x80;
 
 	//Seta o carry
-	if(this->reg_file.getFlagBit(c))
+	if(c_old)
 		this->reg_file.clrFlagBit(c);
 	else
 		this->reg_file.setFlagBit(c);
@@ -909,7 +911,7 @@ void SimpleZ80::addr8a(uint8_t* opcode)
 void SimpleZ80::adcr8a(uint8_t* opcode)
 {
 	//Guarda o carry antigo
-	bool c_old = this->reg_file.getFlagBit(c);
+	uint8_t c_old = (uint8_t)this->reg_file.getFlagBit(c);
 
 	//Limpa os flags
 	this->reg_file.F() = 0x00;
@@ -921,15 +923,15 @@ void SimpleZ80::adcr8a(uint8_t* opcode)
 	uint8_t val = (reg_o == 6) ? (*mem).read(this->reg_file.HL()) : (*this->reg_file.reg8[reg_o]);
 
 	//Verifica o half carry
-	if((((this->reg_file.A()&0x0F) + (uint8_t)c_old)&0x0F) + (val&0x0F) >= 0x10)
+	if(((this->reg_file.A() & 0x0F)+ c_old + (val & 0x0F)) >= 0x10)
 		this->reg_file.setFlagBit(h);
 
 	//Verifica o carry
-	if(((int)(reg_file.A() + val + (uint8_t)c_old)) > 0xFF)
+	if(((int)(reg_file.A() + val + c_old)) > 0xFF)
 		this->reg_file.setFlagBit(c);
 
 	//Efetua a Soma
-	this->reg_file.A() += val + (uint8_t)c_old;
+	this->reg_file.A() += (val + c_old);
 
 	//Verifica o zero
 	if(this->reg_file.A() == 0)
@@ -982,7 +984,7 @@ void SimpleZ80::subr8a(uint8_t* opcode)
 void SimpleZ80::sbcr8a(uint8_t* opcode)
 {
 	//Guarda o resultado antigo do carry
-	bool c_old = this->reg_file.getFlagBit(c);
+	uint8_t c_old = (uint8_t)this->reg_file.getFlagBit(c);
 
 	//Limpa os flags
 	this->reg_file.F() = 0x40;
@@ -994,11 +996,11 @@ void SimpleZ80::sbcr8a(uint8_t* opcode)
 	uint8_t val = (reg_o == 6) ? (*mem).read(this->reg_file.HL()) : (*this->reg_file.reg8[reg_o]);
 
 	//Verifica o half carry
-	if ((int)(((this->reg_file.A() - (int)c_old)&0x0F )-(val&0x0F)))
+	if(((val & 0x0F) + c_old)  >  (this->reg_file.A()&0x0F))
 		this->reg_file.setFlagBit(h);
 
 	//Verifica o carry
-	if(val > this->reg_file.A())
+	if((val + c_old) > this->reg_file.A())
 		this->reg_file.setFlagBit(c);
 
 	//Efetua a Soma
@@ -1171,10 +1173,21 @@ void SimpleZ80::popr16(uint8_t* opcode)
 	uint8_t dest = ((opcode[0] & 0x30) >> 4);
 
 	//Obs: No caso de push e pop o destino é AF, no lugar de SP
-	if(dest == 3) dest++;
-
-	//Carrega o valor da pilha no registro
-	this->reg_file.reg16[dest] = (((*mem).read(this->reg_file.SP()+1) << 0x08) + (*mem).read(this->reg_file.SP()));
+	if(dest == 3) 
+	{
+		//Destino  = AF
+		
+		//Carrega o valor da pilha no registro
+		this->reg_file.A() = (*mem).read(this->reg_file.SP() + 1);
+		this->reg_file.F() = (*mem).read(this->reg_file.SP()) & 0xF0;
+	
+	}
+	else
+	{
+		//Carrega o valor da pilha no registro
+		this->reg_file.reg16[dest] = (((*mem).read(this->reg_file.SP()+1) << 0x08) + (*mem).read(this->reg_file.SP()));
+	}
+	
 
 	//Atualiza a pilha
 	this->reg_file.SP() += 2;
@@ -1219,7 +1232,7 @@ void SimpleZ80::jpnzr16d(uint8_t* opcode)
 void SimpleZ80::jp16d(uint8_t* opcode)
 {
 	//Carrega a constante no contador de programa
-	this->reg_file.PC = ((opcode[2] << 8)+ opcode[1]);
+	this->reg_file.PC = ((opcode[2] << 8) + opcode[1]);
 
 	//Cliclos de clock
 	this->clk_elapsed = 16;
@@ -1235,7 +1248,7 @@ void SimpleZ80::callnzd(uint8_t* opcode)
 	if(!this->reg_file.getFlagBit(z))
 	{
 		//Calcula o endereço de reset
-		uint8_t addr = ((opcode[2] << 8) + opcode[1]);
+		uint16_t addr = ((opcode[2] << 8) + opcode[1]);
 
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -1468,21 +1481,21 @@ void SimpleZ80::calld(uint8_t* opcode)
 void SimpleZ80::adcd8a(uint8_t* opcode)
 {
 	//Guarda o valor do carry antigo
-	bool c_old = this->reg_file.getFlagBit(c);
+	uint8_t c_old = (uint8_t)this->reg_file.getFlagBit(c);
 
 	//Limpa os flags
 	this->reg_file.F() = 0x00;
 
 	//Verifica o half carry
-	if(((this->reg_file.A() + (uint8_t)this->reg_file.getFlagBit(c))&0x0F) + (opcode[1]&0x0F) >= 0x10)
+	if(((this->reg_file.A() & 0x0F) + (opcode[1] & 0x0F) + c_old)  >= 0x10)
 		this->reg_file.setFlagBit(h);
 
-	//Verifica o half carry
-	if((int)(this->reg_file.A() + opcode[1] + (int)c_old) > 0xFF)
+	//Verifica o carry
+	if((int)(this->reg_file.A() + opcode[1] + c_old) > 0xFF)
 		this->reg_file.setFlagBit(c);
 
 	//Efetua a Soma
-	this->reg_file.A() += opcode[1] + (uint8_t)this->reg_file.getFlagBit(c);
+	this->reg_file.A() += (opcode[1] + c_old);
 
 	//Verifica o zero
 	if(this->reg_file.A() == 0)
@@ -1720,7 +1733,7 @@ void SimpleZ80::callcd(uint8_t* opcode)
 void SimpleZ80::sbcd8a(uint8_t* opcode)
 {
 	//Guarda o resultado antigo do carry
-	bool c_old = this->reg_file.getFlagBit(c);
+	uint8_t c_old = (uint8_t)this->reg_file.getFlagBit(c);
 
 	//Limpa os flags
 	this->reg_file.F() = 0x40;
@@ -1728,12 +1741,12 @@ void SimpleZ80::sbcd8a(uint8_t* opcode)
 	//Registro de origem
 	uint8_t reg_o = opcode[0] & 0x07;
 
-	//Verifica o half carry
-	if ((int)(((this->reg_file.A() - (int)c_old)&0x0F )-(opcode[1]&0x0F)))
+	//Verifica o half borrow
+	if(((opcode[1] & 0x0F) + c_old ) > (this->reg_file.A() & 0x0F))
 		this->reg_file.setFlagBit(h);
 
-	//Verifica o carry
-	if((opcode[1] + (int)c_old) > this->reg_file.A())
+	//Verifica o borrow
+	if((opcode[1] + c_old) > this->reg_file.A())
 		this->reg_file.setFlagBit(c);
 
 	//Efetua a Soma
@@ -1803,17 +1816,26 @@ void SimpleZ80::andd8a(uint8_t* opcode)
 //Opcode - 0xE8
 void SimpleZ80::addspd8(uint8_t* opcode)
 {
-	//Calcula o endereço relativo
-	int addr = (opcode[1] > 127) ? (opcode[1] - 256) : addr = opcode[1];
+	//Limpa os Flgas
+	this->reg_file.F() &= 0x00;
 
+	//Verifica o half carry
+	if((this->reg_file.SP() & 0x0F ) + (opcode[1] & 0x0F) >= 0x10)
+		this->reg_file.setFlagBit(h);
+
+	//verifica o carry
+	if(((this->reg_file.SP()&0xFF) + opcode[1]) > 0xFF)
+		this->reg_file.setFlagBit(c);
+	
 	//Soma a constante no registro SP
-	this->reg_file.SP() += addr;
+	this->reg_file.SP() += (int8_t)opcode[1];
 
 	//Atualiza o clock
 	this->clk_elapsed = 16;
 
 	//Atualiza o contador de programa
 	this->reg_file.PC += 2;
+
 }
 
 //JP (HL) - Salto incondicional para o endereço apontado por HL
@@ -1933,11 +1955,20 @@ void SimpleZ80::ord8a(uint8_t* opcode)
 //Opcode - 0xF8
 void SimpleZ80::ldhlspd8(uint8_t* opcode)
 {
-	//Calcula o endereço relativo
-	int addr = (opcode[1] > 127) ? (opcode[1] - 256) : addr = opcode[1];
+
+	//Limpa os Flgas
+	this->reg_file.F() &= 0x00;
+
+	//Verifica o half carry
+	if((this->reg_file.SP() & 0x0F ) + (opcode[1] & 0x0F) >= 0x10)
+		this->reg_file.setFlagBit(h);
+
+	//verifica o carry
+	if(((this->reg_file.SP()&0xFF) + opcode[1]) > 0xFF)
+		this->reg_file.setFlagBit(c);
 
 	//Soma o valor de SP e guarda em HL
-	this->reg_file.HL() = this->reg_file.SP() + addr;
+	this->reg_file.HL() = (uint16_t)(this->reg_file.SP() + (int8_t)opcode[1]);
 
 	//Atualiza o clock
 	this->clk_elapsed = 12;
@@ -2144,7 +2175,7 @@ void SimpleZ80::rrcr8(uint8_t* opcode)
 void SimpleZ80::rlr8(uint8_t* opcode)
 {
 	//Variável temporária para guardar o carry
-	bool c_old = (this->reg_file.getFlagBit(c));
+	uint8_t c_old = (uint8_t)this->reg_file.getFlagBit(c);
 
 	//Limpa o Flags
 	this->reg_file.F() = 0;
@@ -2165,6 +2196,10 @@ void SimpleZ80::rlr8(uint8_t* opcode)
 		//Copia o carry para bit 0
 		(*mem).write(this->reg_file.HL(),(c_old | ((*mem).read(this->reg_file.HL()))));
 
+		//Verifica o resultado é zero
+		if((*mem).read(this->reg_file.HL()) == 0)
+			this->reg_file.setFlagBit(z);
+
 		//Atualiza o clock
 		this->clk_elapsed = 16;
 
@@ -2184,6 +2219,10 @@ void SimpleZ80::rlr8(uint8_t* opcode)
 
 		//Copia o carry para bit 0
 		(*p_reg) |= c_old;
+
+		//Verifica o resultado é zero
+		if((*p_reg) == 0)
+			this->reg_file.setFlagBit(z);
 
 		//Atualiza o clock
 		this->clk_elapsed = 8;
@@ -2221,6 +2260,10 @@ void SimpleZ80::rrr8(uint8_t* opcode)
 		//Copia o carry para bit 7
 		(*mem).write(this->reg_file.HL(),((c_old << 7) | (*mem).read(this->reg_file.HL())));
 
+		//Verifica o resultado é zero
+		if((*mem).read(this->reg_file.HL()) == 0)
+			this->reg_file.setFlagBit(z);
+
 
 		//Atualiza o clock
 		this->clk_elapsed = 16;
@@ -2241,6 +2284,11 @@ void SimpleZ80::rrr8(uint8_t* opcode)
 
 		//Copia o carry para bit 7
 		(*p_reg) |= (c_old << 7);
+
+		//Verifica o resultado é zero
+		if((*p_reg) == 0)
+			this->reg_file.setFlagBit(z);
+
 
 		//Atualiza o clock
 		this->clk_elapsed = 8;	

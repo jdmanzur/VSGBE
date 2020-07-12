@@ -116,7 +116,11 @@ int main(int argc, char *argv[]) {
 	ram[0xFF05] = 0x00;
 	ram[0xFF04] = 0x00;
 
-	//cpu.reg_file.PC = 0x100;
+	cpu.reg_file.A() = 0x36;
+	cpu.reg_file.F() = 0xFF;
+	//cpu.reg_file.HL() = 0x8A23;
+
+	uint8_t isnt_c = 0;
 
 	while(fim)
 	{
@@ -126,15 +130,24 @@ int main(int argc, char *argv[]) {
 
 		uint16_t pc = cpu.reg_file.PC;
 
-		//cout << "PC: "<< hex << pc << " Intru: " << (int)ram[pc]  <<  endl;
-		//cout << "B: " << hex << (int)cpu.reg_file.B() << endl;
+		uint8_t ly = ram[0xFF44];
 
+
+		//cout << "PC: "<< hex << pc << 'h' <<" Intru: " << (int)ram[pc]  <<  endl;
+		//cout << "DE: " << hex << (int)cpu.reg_file.DE() << endl;
+/*
 		//Rotina para enganar o programa e dizer que os botões não estão apetados
-		if((cpu.reg_file.PC == 0x97))
+		if((cpu.reg_file.PC == 0x210))
 		{
 			//Zera todos os botões 
-			ram[0xFF80] = 0x00;
+			//ram[0xFF80] = 0x00;
+			if(isnt_c == 0)
+				cout << "PC: "<< hex << pc  << " Intru: " << (int)ram[pc]  <<  endl;
+
+			isnt_c++;
+
 		}	
+		*/
 
 		//Atualiza o clock da PPU
 		ppu.update(cpu.getClkElapsed());

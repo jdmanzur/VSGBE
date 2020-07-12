@@ -77,11 +77,11 @@ struct registers : public RegisterFile
 
 
 	//Registros acessados como 16 bits
-	uint16_t& AF() { return reg16[4]; }
 	uint16_t& BC() { return reg16[0]; }
 	uint16_t& DE() { return reg16[1]; }
 	uint16_t& HL() { return reg16[2]; }
 	uint16_t& SP() { return reg16[3]; }
+	uint16_t& AF() { return reg16[4]; }
 
 	//Bits dos Flags
 	void setFlagBit(int bit) { (this->F()) |= bit; }
@@ -99,11 +99,11 @@ struct registers : public RegisterFile
     const uint8_t& A() const { return (*reg8[7]); }
 
     //Registros acessados como 16 bits
-	const uint16_t& AF() const { return reg16[4]; }
 	const uint16_t& BC() const { return reg16[0]; }
 	const uint16_t& DE() const { return reg16[1]; }
 	const uint16_t& HL() const { return reg16[2]; }
 	const uint16_t& SP() const { return reg16[3]; }
+	const uint16_t& AF() const { return reg16[4]; }
 
     //Bits dos Flags
     bool getFlagBit(int bit) { return (bool)((*reg8[6]) & bit); }

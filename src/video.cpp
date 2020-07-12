@@ -79,16 +79,20 @@ void Video::drawnTileLine(uint8_t* tile_data,uint8_t bgp,uint8_t line,uint8_t co
 
         //Verde mais escuro (Preto);
         if (dec == 3)
-            p[i/2] = 0x000F380F;
+            //p[i/2] = 0x000F380F;
+            p[i/2] = 0x00000000;
         //Verde escuro
         else if (dec == 2)
-            p[i/2] = 0x00306230;
+            //p[i/2] = 0x00306230;
+            p[i/2] = 0x00555555;
         //Verde médio
         else if (dec == 1)
-            p[i/2] = 0x008bac0f;
+            //p[i/2] = 0x008bac0f;
+            p[i/2] = 0x00888888;
         //Verde claro
         else if (dec == 0)
-            p[i/2] = 0x00CADC9F;
+            //p[i/2] = 0x00CADC9F;
+            p[i/2] = 0x00CCCCCC;
         
         }
 

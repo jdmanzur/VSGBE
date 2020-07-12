@@ -54,7 +54,7 @@ void Ppu::drawnLineBG()
 {
 	//Deslocamento horizontal e vertical para scroll
         uint8_t scrollx = (*mem).read(SCX);
-        uint8_t	scrolly = (*mem).read(SCY);
+        uint8_t scrolly = (*mem).read(SCY);
 
         //tiles deslocados em relação ao scroll y
         uint8_t inc_tile_y = ((scrolly & 0xF8) >> 3);
