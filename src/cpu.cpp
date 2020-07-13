@@ -79,7 +79,7 @@ void SimpleZ80::Checkinterrupt()
 		(*mem).write(--this->reg_file.SP(),(this->reg_file.PC & 0x00FF));
 
 		//Executa o salto para o endereço de interrupção
-		this->reg_file.PC = 0x40;
+		this->reg_file.PC = 0x0040;
 
 		//Desabilita a interrupção
 		(*mem).write(IF,((*mem).read(IF) & 0xFE));
@@ -1329,7 +1329,7 @@ void SimpleZ80::rst(uint8_t* opcode)
 	this->reg_file.PC += 1;
 
 	//Calcula o endereço de reset
-	uint8_t addr = (opcode[0] & 0x38);
+	uint16_t addr = (uint16_t)(opcode[0] & 0x38);
 
 	//Coloca o valor da próxima instrução na pilha
 	(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -1435,7 +1435,7 @@ void SimpleZ80::callzd(uint8_t* opcode)
 	if(this->reg_file.getFlagBit(z))
 	{
 		//Calcula o endereço de reset
-		uint8_t addr = ((opcode[2] << 8) + opcode[1]);
+		uint16_t addr = ((opcode[2] << 8) + opcode[1]);
 
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -1574,7 +1574,7 @@ void SimpleZ80::callncd(uint8_t* opcode)
 	if(!this->reg_file.getFlagBit(c))
 	{
 		//Calcula o endereço de reset
-		uint8_t addr = ((opcode[2] << 8) + opcode[1]);
+		uint16_t addr = ((opcode[2] << 8) + opcode[1]);
 
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -1710,7 +1710,7 @@ void SimpleZ80::callcd(uint8_t* opcode)
 	if(this->reg_file.getFlagBit(c))
 	{
 		//Calcula o endereço de reset
-		uint8_t addr = ((opcode[2] << 8) + opcode[1]);
+		uint16_t addr = ((opcode[2] << 8) + opcode[1]);
 
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
