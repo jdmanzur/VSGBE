@@ -60,16 +60,22 @@ uint16_t SimpleZ80::getClkElapsed() { return this->clk_elapsed; }
 //Verifica se houve interrupção
 void SimpleZ80::Checkinterrupt()
 {
-	//Verifica os bis de isntrução
+	//Verifica os bits de interrupção
+
+	//Variável temporária para interrupções
+	uint8_t temp_if = (*mem).read(IF);
 
 	//V BLANK
-	bool vblank_if = ((*mem).read(IF) & 0x01);
+	bool vblank_if = (temp_if & 0x01);
 
 	//LCLD
-	bool lcld_if = ((*mem).read(IF) & 0x02);
+	bool lcld_if = (temp_if & 0x02);
+
+	// Timer
+	bool timer_if = (temp_if & 0x04);
 
 	//P10-P13 Terminal Negative Edge
-	bool joy_if = ((*mem).read(IF) & 0x10);
+	bool joy_if = (temp_if & 0x10);
 
 	//Caso tenha ocorrido a interrupção de V BLANK
 	if(vblank_if && this->IME)
@@ -94,7 +100,19 @@ void SimpleZ80::Checkinterrupt()
 		this->reg_file.PC = 0x48;
 
 		//Desabilita a interrupção
-		(*mem).write(IF,((*mem).read(IF) & 0xFD));		
+		(*mem).write(IF,((*mem).read(IF) & 0xFD));
+
+	}else if(timer_if && this->IME)
+	{
+		//Coloca o valor da próxima instrução na pilha
+		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
+		(*mem).write(--this->reg_file.SP(),(this->reg_file.PC & 0x00FF));
+
+		//Executa o salto para o endereço de interrupção
+		this->reg_file.PC = 0x50;
+
+		//Desabilita a interrupção
+		(*mem).write(IF,((*mem).read(IF) & 0xFB));
 	}
 	
 

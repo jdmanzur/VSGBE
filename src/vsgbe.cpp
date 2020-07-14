@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "appInit.h"
 #include "ppu.h"
 #include "input.h"
+#include "timer.h"
 
 using namespace std;
 
@@ -88,18 +89,8 @@ int main(int argc, char *argv[]) {
 	//Instância da Entardas
 	InputCrt entrada(&ram,&e);
 
-/*	for(int i = 0; i < 256; i++)
-		cout << hex << (int)ram[i] << endl;
-
-
-	uint8_t opcode1[2] = {0x0E,0x64};
-	uint8_t opcode2 = 0x0D;
-
-	cpu.runOp(opcode1);
-	cpu.runOp(&opcode2);
-
-	cout << cpu.reg_file.C() << endl;
-*/
+	//Instância do timer
+	Timer timer(&ram);
 
 	uint16_t sys_clk = 0;
 
@@ -113,11 +104,10 @@ int main(int argc, char *argv[]) {
 	ram[0xFF00] = 0xFF;
 
 	//Mundança manual do timer
-	ram[0xFF05] = 0x00;
-	ram[0xFF04] = 0x00;
+	//ram[0xFF05] = 0x00;
 
-	cpu.reg_file.A() = 0x36;
-	cpu.reg_file.F() = 0xFF;
+	//cpu.reg_file.A() = 0x36;
+	//cpu.reg_file.F() = 0xFF;
 	//cpu.reg_file.HL() = 0x8A23;
 
 	uint8_t isnt_c = 0;
@@ -126,6 +116,9 @@ int main(int argc, char *argv[]) {
 	{
 		//Roda uma instrução da CPU
 		cpu.runInstruction();
+
+		//Ciclos levados pela última instrução
+		uint8_t clk_e = cpu.getClkElapsed();
 
 
 		uint16_t pc = cpu.reg_file.PC;
@@ -150,14 +143,19 @@ int main(int argc, char *argv[]) {
 		*/
 
 		//Atualiza o clock da PPU
-		ppu.update(cpu.getClkElapsed());
+		ppu.update(clk_e);
+
+		//Atualiza o Timer de sistema
+		timer.update(clk_e);
 
 		//Atualiza as entradas
 		entrada.UpdateAppUI();
 
+		
+
 		//Mundança manual do timer
-		ram.write(0xFF05,(ram.read(0xFF05) + cpu.getClkElapsed()));
-		ram.write(0xFF04,(ram.read(0xFF04) + cpu.getClkElapsed()));
+		//ram.write(0xFF05,(ram.read(0xFF05) + clk_e));
+		//ram.write(0xFF04,(ram.read(0xFF04) + cpu.getClkElapsed()));
 
 		//Zera todos os botões 
 		//ram[0xFF80] = 0x00;
