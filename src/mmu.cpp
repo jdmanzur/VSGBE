@@ -48,7 +48,7 @@ Mmu::Mmu(uint8_t* bios_a, uint8_t* rom_a, uint32_t rom_s)
         this->bios[i] = bios_a[i];
 
     //Carrega a ROM
-    for(int i = 0; i < ROM_SIZE; i++)
+    for(int i = 0; i < rom_s; i++)
     {
         if(i < ROM_BANK_SIZE)
             this->f_rom[i] = rom_a[i];

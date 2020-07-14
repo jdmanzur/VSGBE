@@ -40,11 +40,21 @@ private:
 	//Ponteiros de funções com dois argumentos
 	typedef void (SimpleZ80::*function_pointer) (uint8_t* opcode);
 
+	//Registros da CPU
 	//registers reg_file;
-	bool IME;
+	
+	//Flag de interrupção global
+	//bool IME;
+
+	//Estado da CPU
 	uint8_t cpu_state;
+	
+	//Clock decorrido
 	uint8_t clk_elapsed;
+	
+	//Ponteiro para memória
 	Mmu* mem;
+	
 	//Ponteiro para instruções da CPU
 	//TODO:Talvez tonar isso estático...
 	function_pointer instr_array[256] =
@@ -639,6 +649,8 @@ private:
 public:
 
 	registers reg_file;
+
+	bool IME;
 
 	//Construtor
 	SimpleZ80(Mmu* mem_arr);

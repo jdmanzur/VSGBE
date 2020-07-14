@@ -34,9 +34,13 @@ private:
     //Ponteiro para o espaço de memória
     Mmu* mem;
 
+    //Gravação de estado anteiror das teclas
+    uint8_t p14_old;
+    uint8_t p15_old;
+
     //Variável de eventos para SDL
     SDL_Event* input_e;
-
+    
 public:
 
     //Variável para usuário sair da aplicação

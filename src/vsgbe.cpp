@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "mmu.h"
 #include "cpu.h"
 #include "appInit.h"
+#include "ioRegAddr.h"
 #include "ppu.h"
 #include "input.h"
 #include "timer.h"
@@ -123,14 +124,13 @@ int main(int argc, char *argv[]) {
 
 		uint16_t pc = cpu.reg_file.PC;
 
-		uint8_t ly = ram[0xFF44];
-
 
 		//cout << "PC: "<< hex << pc << 'h' <<" Intru: " << (int)ram[pc]  <<  endl;
-		//cout << "DE: " << hex << (int)cpu.reg_file.DE() << endl;
-/*
+		//cout << "IE: " << hex << (int)ram[IE] << endl;
+		//cout << "IME: " << hex << (int)cpu.IME << endl;
+
 		//Rotina para enganar o programa e dizer que os botões não estão apetados
-		if((cpu.reg_file.PC == 0x210))
+		if((cpu.reg_file.PC == 0x7ff3))
 		{
 			//Zera todos os botões 
 			//ram[0xFF80] = 0x00;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
 			isnt_c++;
 
 		}	
-		*/
+		
 
 		//Atualiza o clock da PPU
 		ppu.update(clk_e);

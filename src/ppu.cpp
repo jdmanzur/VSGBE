@@ -518,7 +518,7 @@ void Ppu::ModeUpdate()
         if(this->mode_flag != old_mode)
         {
                 //Verfica se a interrupção de V BLANK está ocorrendo
-                if((this->mode_flag == VBLANK)&&(v_blank_on))
+                if(this->mode_flag == VBLANK)
                         (*mem).write(IF,((*mem).read(IF) | 0x01));
 
                 //Verifica as interrupções stat

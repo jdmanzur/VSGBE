@@ -33,6 +33,10 @@ InputCrt::InputCrt(Mmu *mem_s,SDL_Event* e)
     //Variável para indicar se usuário quer sair do programa
     this->app_quit = 0;
 
+    //Inicializa o estado antigos da teclas
+    this->p14_old = 1;
+    this->p15_old = 1;
+
     //Inicializa os eventos do SDL
    //if(SDL_Init(SDL_INIT_EVENTS) < 0);
    assert(SDL_Init(SDL_INIT_EVENTS) >= 0);
@@ -94,7 +98,11 @@ void InputCrt::UpdateAppUI()
         //Atualiza a memória
         (*mem).write(P1,k_read + ((!p14) << 4) + ((!p15) << 5));
 
-        //std::cout << std::hex << (int)k_read << std::endl;
+       //Verifica interrupção de acionamento das teclas
+       if(this->p14_old > (*mem).read(P1))
+            (*mem).write(IF,((*mem).read(IF) | 0x10));
+
+        this->p14_old = (*mem).read(P1);
               
     }
     else if(p15)
@@ -113,6 +121,12 @@ void InputCrt::UpdateAppUI()
 
         //Atualiza a memória
         (*mem).write(P1,k_read + ((!p14) << 4) + ((!p15) << 5));
+
+        //Verifica interrupção de acionamento das teclas
+       if(this->p15_old > (*mem).read(P1))
+            (*mem).write(IF,((*mem).read(IF) | 0x10));
+
+        this->p15_old = (*mem).read(P1);
 
     }
 

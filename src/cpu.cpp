@@ -39,18 +39,24 @@ SimpleZ80::SimpleZ80(Mmu* mem_arr)
 void SimpleZ80::runInstruction()
 {
 	//Verifica interrupções
-	this->Checkinterrupt();
+	if(this->IME)
+		this->Checkinterrupt();
+	
 	//Carrega Instrução (Fecth)
     uint8_t opcode[] = {(*mem).read(reg_file.PC), (*mem).read(reg_file.PC + 1), (*mem).read(reg_file.PC + 2) };
-    //Decodifica e excuta
-    (this->*instr_array[opcode[0]])(opcode);
+    
+	//Decodifica e excuta
+	if(this->cpu_state == RUN)
+    	(this->*instr_array[opcode[0]])(opcode);
+	else if (this->cpu_state == HALT)
+		this->clk_elapsed += 4;
 
 }
 
 //Executa um opcode
 void SimpleZ80::runOp(uint8_t *opcode)
 {
-	//Decodifica e excuta
+	//Decodifica e executa
 	(this->*instr_array[opcode[0]])(opcode);
 }
 
@@ -64,21 +70,38 @@ void SimpleZ80::Checkinterrupt()
 
 	//Variável temporária para interrupções
 	uint8_t temp_if = (*mem).read(IF);
+	uint8_t temp_ie = (*mem).read(IE);
 
 	//V BLANK
 	bool vblank_if = (temp_if & 0x01);
+	bool vblank_ie = (temp_ie & 0x01);
 
 	//LCLD
 	bool lcld_if = (temp_if & 0x02);
+	bool lcld_ie = (temp_ie & 0x02);
 
 	// Timer
 	bool timer_if = (temp_if & 0x04);
+	bool timer_ie = (temp_ie & 0x04);
 
 	//P10-P13 Terminal Negative Edge
 	bool joy_if = (temp_if & 0x10);
+	bool joy_ie = (temp_ie & 0x10);
+
+	//Limpa o IME, caso haja interrupção
+	if(temp_if & temp_ie & 0x1F)
+	{
+		this->IME = 0;
+
+		//Religa a CPU
+		if(this->cpu_state == HALT)
+			this->cpu_state = RUN;
+
+	}
+
 
 	//Caso tenha ocorrido a interrupção de V BLANK
-	if(vblank_if && this->IME)
+	if(vblank_if && vblank_ie)
 	{
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -90,7 +113,11 @@ void SimpleZ80::Checkinterrupt()
 		//Desabilita a interrupção
 		(*mem).write(IF,((*mem).read(IF) & 0xFE));
 
-	}else if (lcld_if && this->IME)
+		//Religa a CPU
+		if(this->cpu_state == HALT)
+			this->cpu_state = RUN;
+
+	}else if (lcld_if && lcld_ie)
 	{
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -102,7 +129,8 @@ void SimpleZ80::Checkinterrupt()
 		//Desabilita a interrupção
 		(*mem).write(IF,((*mem).read(IF) & 0xFD));
 
-	}else if(timer_if && this->IME)
+
+	}else if(timer_if && timer_ie)
 	{
 		//Coloca o valor da próxima instrução na pilha
 		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
@@ -113,6 +141,18 @@ void SimpleZ80::Checkinterrupt()
 
 		//Desabilita a interrupção
 		(*mem).write(IF,((*mem).read(IF) & 0xFB));
+	
+	}else if(joy_if && joy_ie)
+	{
+		//Coloca o valor da próxima instrução na pilha
+		(*mem).write(--this->reg_file.SP(),((this->reg_file.PC & 0xFF00)>>8));
+		(*mem).write(--this->reg_file.SP(),(this->reg_file.PC & 0x00FF));
+
+		//Executa o salto para o endereço de interrupção
+		this->reg_file.PC = 0x60;
+
+		//Desabilita a interrupção
+		(*mem).write(IF,((*mem).read(IF) & 0xEF));
 	}
 	
 
@@ -512,7 +552,7 @@ void SimpleZ80::rrca(uint8_t* opcode)
 void SimpleZ80::stop(uint8_t* opcode)
 {
 	//Para a CPU
-	this->cpu_state = STOP;
+	//this->cpu_state = STOP;
 
 	//Parte desnecessária, mantida só para lembrar que a intrução STOP usa dois bytes da memória
 
@@ -879,14 +919,48 @@ void SimpleZ80::ldr8r8(uint8_t* opcode)
 //Opcode - 0x76
 void SimpleZ80::halt(uint8_t* opcode)
 {
-	//TODO: Verificar o comportamento em bugs em relação ao estado da EMI
-	this->cpu_state = HALT;
+
+	//Verifica o Esatdo da interrupção
+
+	//Halt "normal"
+	if(this->IME)
+	{
+
+		//Muda o estado da CPU
+		this->cpu_state = HALT;
+
+		//Atualiza o clock
+		//this->clk_elapsed = 1;
+
+		//Atualiza o PC
+		this->reg_file.PC += 1;
+
+	}else if((!this->IME) && (!((*mem).read(IF) & (*mem).read(IE) & 0x1F)))
+	{
+
+		//TODO: Verificar este valor
+		this->clk_elapsed = 4;
+
+		if((*mem).read(IF) & 0x1F)
+			this->reg_file.PC += 1;
+
+	}else if((!this->IME) && ((*mem).read(IF) & (*mem).read(IE) & 0x1F))
+	{
+		//TODO:Implementar corretamente este Bug
+
+		//Tenta replicar o bug de pular uma instrução
+		this->reg_file.PC += 1;
+
+		//TODO: Verificar este valor
+		this->clk_elapsed = 4;
+	}
+	
 
 	//Atualiza o clock
-	this->clk_elapsed = 4;
+	//this->clk_elapsed = 4;
 
 	//Atualiza o contador de programa
-	this->reg_file.PC += 1;
+	//this->reg_file.PC += 1;
 
 }
 
