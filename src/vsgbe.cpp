@@ -38,31 +38,15 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-	//Variáveis temporárias para ram e bios
-
-	//Carrega a bios e a rom
-	//loadBios((char*)bios);
-	//loadROM((char*)rom);
-
+	//Verifica o No de argumentos
 	assert(argc >= 3);
 
+	//Evento para leitura do teclado
 	SDL_Event e;
-
-	//Local da bios
-	//char bios_l[] = "/home/adriano/Documentos/gb/bios.gb";
-
-	//Local da rom
-	//char rom_l[] = "/home/adriano/Documentos/gb/tetris.gb";
 
 	//Horrível, melhorar
 	uint8_t* bios = new uint8_t[getFilesize(argv[1])];
 	uint8_t* rom =  new uint8_t[getFilesize(argv[2])];
-	//uint8_t* bios = (uint8_t*)malloc(getFilesize(bios_l)*sizeof(uint8_t));
-	//uint8_t* rom =  (uint8_t*)malloc(getFilesize(rom_l)*sizeof(uint8_t));
-
-
-	//uint8_t bios[256];
-	//uint8_t rom[32768];
 
 	//Carrega a ROM e a BIOS
 	loadBiosROM(argv[1],argv[2],(char*)bios,(char*)rom);
@@ -72,14 +56,10 @@ int main(int argc, char *argv[]) {
 	Mmu ram(bios,rom,getFilesize(argv[2]));
 
 
-
 	//Librera a ram
 	delete [] bios;
 	delete [] rom;
 
-
-	//Carrega o espaço de memória
-	//loadBiosROM(ram,bios_l,rom_l);
 
 	//Instância da CPU
 	SimpleZ80 cpu(&ram);

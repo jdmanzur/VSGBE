@@ -163,14 +163,20 @@ void Ppu::GetTileLine(uint16_t tile_n,uint8_t type,uint8_t line,uint8_t* tile_da
 void Ppu::drawnLineWd()
 {
         //Posição da janela na tela
-        uint8_t pos_x = (*mem).read(WX);
-        uint8_t pos_y = ((*mem).read(WY) - 7);
+        int16_t pos_x = ((*mem).read(WX) - 7);
+        uint8_t pos_y = (*mem).read(WY);
+
+        //Não aceitas No negativos
+        if(pos_x < 0) pos_x = 0;
 
         //Verifica se a janela esta dentro da tela
         if(this->line >= pos_y )
         {
+                //Tiles deslocados em relação ao scroll x
+                uint8_t inc_tile_x = ((pos_x & 0xF8) >> 3);
+
                 //Tile atual a ser escrito
-                uint16_t n_tile = ((this->line - pos_y)/8) * 32;
+                uint16_t n_tile = (((this->line - pos_y)/8) * 32);
 
                 //No da linha dentro sprite
                 uint8_t sub_line = ((this->line -  pos_y) & 0x07);
@@ -258,7 +264,6 @@ void Ppu::drawnLineOB()
                                 this->GetObjLine(i,(this->line - obj_y),obj_data);
 
                                 //Desenha o sprite
-                                //TODO:Criar uma função que leva em conta a palheta
                                 video.drawnTileLine(obj_data,pal_num,obj_pal,this->line,obj_x,0,7);
                         }
    
@@ -295,9 +300,11 @@ void Ppu::GetObjLine(uint8_t obj_n,uint8_t line,uint8_t* obj_data)
         bool x_flip = (((*mem).read(oam_addr + 3) & 0x20) >> 5);
 
         //Calcula o novo endereço para rotação no eixo y
-        //TODO: Adicinar suporte para 8x16
         if(y_flip)
-                data_addr = (data_addr + 14) - (line * 2);
+                if(ob_size)
+                        data_addr +=  (28 - (line * 2));
+                else
+                        data_addr +=  (14 - (line * 2));
         else
                 data_addr += (line * 2);
 
