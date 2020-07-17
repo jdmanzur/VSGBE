@@ -68,8 +68,8 @@ private:
                                  {0x00CADC9F,0x008bac0f,0x00306230,0x00000000},
                                  {0x00CADC9F,0x008bac0f,0x00306230,0x00000000}};
 */
-    const uint32_t pal_c[3][4] = {{0x00EEEEEE,0x00D0C4A0,0x00FFCBC1,0x00000000},
-                                 {0x00FFFFFF,0x00DBFFD6,0x006EB5FF,0x00000000},
+    const uint32_t pal_c[3][4] = {{0x00EEEEEE,0x00FFCBC1,0x005FBFB8,0x00000000},
+                                 {0x00FFFFFF,0x00D0C4A0,0x006EB5FF,0x00000000},
                                  {0x00FFFFFF,0x00DCD3FF,0x00FF9CEE,0x00000000}};
 
 public:
@@ -78,12 +78,6 @@ public:
 
     //Desenha uma linha na buffer
     void drawnTileLine(uint8_t* tile_data,uint8_t tile_type,uint8_t bgp,uint8_t line,uint8_t col,uint8_t start,uint8_t end);
-
-    //Escreve diretamente no buffer
-    void writeTileBuffer(uint8_t data[8][8],uint16_t,uint16_t,uint8_t bgp);
-
-    //Converte as cores para RGB
-    void decodeRGBA(uint8_t* tile_data,uint8_t bgp,uint32_t* line_rgba);
      
     //Rotina que transfere buffer para o renderer e mostra na tela
     void drawnTextures();

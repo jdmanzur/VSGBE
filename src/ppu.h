@@ -62,14 +62,11 @@ public:
 	//Desenha uma linha do background no buffer 
 	void drawnLineBG();
 
+        //Desenha uma linha da janela no buffer
+        void drawnLineWd();
+
         //Desenha uma linha de sprites no buffer
         void drawnLineOB();
-
-        //Desenha um tile na tela
-        void drawnTile(uint16_t tile_num, uint8_t x, uint8_t y);
-
-        //Desenha todos os tiles no framebuffer
-        void drawnAllTiles();
 
 	//Atualiza o estado da PPU
 	void update(uint8_t e_clk);
@@ -84,7 +81,7 @@ public:
         void GetObjLine(uint8_t obj_n,uint8_t line,uint8_t* obj_data);
 
         //Retorna uma linha do tile
-        void GetTileLine(uint16_t tile_n,uint8_t line,uint8_t* tile_data);
+        void GetTileLine(uint16_t tile_n,uint8_t type,uint8_t line,uint8_t* tile_data);
 
         //Atribui valor ao clock da PPU
         uint32_t getClk();

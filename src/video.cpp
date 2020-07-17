@@ -84,86 +84,12 @@ void Video::drawnTileLine(uint8_t* tile_data,uint8_t tile_type,uint8_t bgp,uint8
 
     //TODO:Verficar condição quando Houver deslocamonto Horizontal
     for(int x = start; x <= end; x++)
-        if(!(tile_type && (p[tile_data[x]] == pal_c[1][0])))
+        if(!(tile_type && (tile_data[x] == 0)))
             this->BG_buff[(x - start) + (line*160) + (col)] = p[tile_data[x]];
     
 }
     
-//TODO:Melhorar isso...
-//Converte as cores para RGB
-void Video::decodeRGBA(uint8_t* tile_data,uint8_t bgp,uint32_t* line_rgba)
-{
 
-    //Vetor para guardar a palheta de cores
-    uint32_t p[4];
-        
-    //Decodificação da palheta
-    for(int i = 0; i < 8; i+=2)
-    {
-        //Decodifica a palheta de cores
-        uint8_t dec = ((bgp & (3 << i)) >> i);
-
-        //Verde mais escuro (Preto);
-        if (dec == 3)
-            p[i/2] = 0x000F380F;
-        //Verde escuro
-        else if (dec == 2)
-            p[i/2] = 0x00306230;
-        //Verde médio
-        else if (dec == 1)
-            p[i/2] = 0x008bac0f;
-        //Verde claro
-        else if (dec == 0)
-            p[i/2] = 0x009bbc0f;
-        
-        }
-
-        //Realiza um ou entre cada bit das duas posições da matriz
-        //TODO: Deixar isso mais claro...
-        for(int i = 0; i < 0x10000; i++)
-        {
-            //Converte os dois bytes para bits
-            line_rgba[i] = p[tile_data[i]];
-
-        }
-
-}
-
-//Escreve diretamente no buffer
-void Video::writeTileBuffer(uint8_t data[8][8],uint16_t i,uint16_t j,uint8_t bgp)
-{
-
-    //Vetor para guardar a palheta de cores
-    uint32_t p[4];
-        
-    //Decodificação da palheta
-    for(int i = 0; i < 8; i+=2)
-    {
-        //Decodifica a palheta de cores
-        uint8_t dec = ((bgp & (3 << i)) >> i);
-
-        //Verde mais escuro (Preto);
-        if (dec == 3)
-            p[i/2] = 0x000F380F;
-        //Verde escuro
-        else if (dec == 2)
-            p[i/2] = 0x00306230;
-        //Verde médio
-        else if (dec == 1)
-            p[i/2] = 0x008bac0f;
-        //Verde claro
-        else if (dec == 0)
-            p[i/2] = 0x009bbc0f;
-        
-        }
-
-
-    for(int x = 0; x < 8; x++)
-        for(int y = 0; y < 8; y ++)
-            this->BG_buff[(y+i) + ((x+j)*256)] = p[data[x][y]];
-
-}
-    
 //Rotina que transfere buffer para o renderer e mostra na tela
 void Video::drawnTextures()
 {

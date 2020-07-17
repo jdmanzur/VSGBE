@@ -84,7 +84,7 @@ void Ppu::drawnLineBG()
         //TODO:Verficar comportamento quando houver deslocamento horizontal
         for(int i = 0; i < 160; )
         {
-			
+		//Início e fim da coluna dentro do tile	
 		int c_start = 0;
 		int c_end = 7;
 			
@@ -94,7 +94,7 @@ void Ppu::drawnLineBG()
 
                
                 //Pega os dados do tile
-                this->GetTileLine((n_tile++),sub_line,tile_data);
+                this->GetTileLine((n_tile++),0,sub_line,tile_data);
                 
                 //Desenha a linha do tile no framebuffer
                 this->video.drawnTileLine(tile_data,0,(*mem).read(BGP),this->line,(i),c_start,c_end);
@@ -107,6 +107,107 @@ void Ppu::drawnLineBG()
                 i += ((c_end - c_start)+1);
 
         }
+
+}
+
+//Retorna uma linha do Tile
+void Ppu::GetTileLine(uint16_t tile_n,uint8_t type,uint8_t line,uint8_t* tile_data)
+{
+        
+        //Secção da ram que guarda os códigos de tiles
+        //Verifica qual a Banco de códigos de tiles utilizado
+	uint16_t code_addr = 0x9C00;
+
+        //Secção da ram que guarda os dados dos tiles
+        //Verifica qual a Banco de dados de tiles utilizado
+        uint16_t data_addr = ((*mem).read(LCDC) & 0x10) ? 0x8000 : 0x9000;
+
+
+        //Tipo 0 : Background
+        if(type == 0)
+                code_addr = ((*mem).read(LCDC) & 0x08) ? 0x9C00 : 0x9800;
+        //Tipo 1 : Janela
+        else
+                code_addr = ((*mem).read(LCDC) & 0x40) ? 0x9C00 : 0x9800;
+
+
+        uint16_t tile_addr;
+       
+        //Endereço do tile em relação ao tipo de tile 16x8 ou 8x8
+        if((data_addr == 0x9000)&&((*mem).read(code_addr + tile_n) > 127))
+                tile_addr = data_addr - ((256 -(*mem).read(code_addr + tile_n))*16);
+        else
+                tile_addr = data_addr + ((*mem).read(code_addr + tile_n)*16);
+
+        //Endereço Base
+        uint16_t base = tile_addr + (line * 2);
+
+        //Percorre as colunas dentro do tile
+        for(int j = 0; j < 8; j++)
+        {
+                //TODO:Melhorar, código pouco legível
+                if(j == 0)
+                {
+			tile_data[7-j] = (((*mem).read(base)&1))|(((*mem).read(base+1) & 1)<<1);
+		}
+		else
+                {
+		        tile_data[7-j] = (((*mem).read(base)&(1<<j))>>j)|(((*mem).read(base+1)&(1<<j))>>(j-1));
+		}
+        }
+
+   
+}
+
+//Desenha uma linha da janela no buffer
+void Ppu::drawnLineWd()
+{
+        //Posição da janela na tela
+        uint8_t pos_x = (*mem).read(WX);
+        uint8_t pos_y = ((*mem).read(WY) - 7);
+
+        //Verifica se a janela esta dentro da tela
+        if(this->line >= pos_y )
+        {
+                //Tile atual a ser escrito
+                uint16_t n_tile = ((this->line - pos_y)/8) * 32;
+
+                //No da linha dentro sprite
+                uint8_t sub_line = ((this->line -  pos_y) & 0x07);
+
+                //Colunas deslocadas dentro do tile pelo scroll x
+                uint8_t inc_colu_x = (pos_x & 0x07);
+
+                //Variável para guardar a linha decodificada
+                uint8_t tile_data[8];
+
+                //Desenha o tile no buffer
+                //TODO:Verficar comportamento quando houver deslocamento horizontal
+                for(int i = pos_x; i < 160; )
+                {
+
+                        //Início e fim da coluna dentro do tile	
+		        int c_start = 0;
+		        int c_end = 7;
+			
+                        //Tiles para desenhar
+                        if(inc_colu_x &&(i == pos_x))
+        	                c_start = inc_colu_x;
+            
+                        //Pega os dados do tile
+                        this->GetTileLine((n_tile++),1,sub_line,tile_data);
+                
+                        //Desenha a linha do tile no framebuffer
+                        this->video.drawnTileLine(tile_data,0,(*mem).read(BGP),this->line,i ,c_start,c_end);
+                        
+                        //Incrementa a coluna 
+                        i += ((c_end - c_start)+1);
+
+                }       
+
+        }
+
+
 
 }
 
@@ -167,8 +268,6 @@ void Ppu::drawnLineOB()
 
         }
 
-        //std::cout << (int)ob_num << std::endl;
-
 }
 
 //Retorna uma linha do sprite
@@ -205,40 +304,37 @@ void Ppu::GetObjLine(uint8_t obj_n,uint8_t line,uint8_t* obj_data)
         
         //Percorre as colunas dentro do sprite
         if(x_flip)
-		{
+	{
                 for(int j = 0; j < 8; j++)
-				{	
+		{	
+			
+		        //TODO:Melhorar, código pouco legível
+			if(j == 0)
+			{
+				obj_data[j] = (((*mem).read(data_addr)&1))|(((*mem).read(data_addr+1) & 1)<<1);
+			}
+			else
+			{
 					
-					//TODO:Melhorar, código pouco legível
-					if(j == 0)
-					{
-						obj_data[j] = (((*mem).read(data_addr)&1))|(((*mem).read(data_addr+1) & 1)<<1);
-					}
-					else
-					{
-					
-						obj_data[j] = (((*mem).read(data_addr)&(1<<j))>>j)|(((*mem).read(data_addr+1)&(1<<j))>>(j-1));
-					}
+				obj_data[j] = (((*mem).read(data_addr)&(1<<j))>>j)|(((*mem).read(data_addr+1)&(1<<j))>>(j-1));
+			}
 
                 }
          }        
         else
         {
-			        for(int j = 0; j < 8; j++)
-			        {
-						//TODO:Melhorar, código pouco legível
-						if(j == 0)
-						{
-							obj_data[7-j] = (((*mem).read(data_addr)&1))|(((*mem).read(data_addr+1) & 1)<<1);
-						}
-						else
-						{
-					
-							obj_data[7-j] = (((*mem).read(data_addr)&(1<<j))>>j)|(((*mem).read(data_addr+1)&(1<<j))>>(j-1));
-						}
-
-                        
-                        //obj_data[7-j] = (((*mem).read(data_addr)&(1<<j))>>j)|(((*mem).read(data_addr+1)&(1<<j))>>(j-1));
+		for(int j = 0; j < 8; j++)
+		{
+			//TODO:Melhorar, código pouco legível
+			if(j == 0)
+			{
+				obj_data[7-j] = (((*mem).read(data_addr)&1))|(((*mem).read(data_addr+1) & 1)<<1);
+			}
+			else
+			{
+				
+		        	obj_data[7-j] = (((*mem).read(data_addr)&(1<<j))>>j)|(((*mem).read(data_addr+1)&(1<<j))>>(j-1));
+			}
                         
                     }
         }
@@ -247,111 +343,6 @@ void Ppu::GetObjLine(uint8_t obj_n,uint8_t line,uint8_t* obj_data)
 
 }
 
-//Retorna uma linha do Tile
-void Ppu::GetTileLine(uint16_t tile_n,uint8_t line,uint8_t* tile_data)
-{
-        //Secção da ram que guarda os códigos de tiles
-        //Verifica qual a Banco de códigos de tiles utilizado
-        //TODO:Substituir o No 0x08 por máscara p/ bit 3
-	uint16_t code_addr = ((*mem).read(LCDC) & 0x08) ? 0x9C00 : 0x9800;
-
-	//Secção da ram que guarda os dados dos tiles
-        //Verifica qual a Banco de dados de tiles utilizado
-        //TODO:Substituir o No 0x10 por máscara p/ bit 4
-	uint16_t data_addr = ((*mem).read(LCDC) & 0x10) ? 0x8000 : 0x9000;
-
-        uint16_t tile_addr;
-       
-        //Endereço do tile
-        if((data_addr == 0x9000)&&((*mem).read(code_addr + tile_n) > 127))
-                tile_addr = data_addr - ((256 -(*mem).read(code_addr + tile_n))*16);
-        else
-                tile_addr = data_addr + ((*mem).read(code_addr + tile_n)*16);
-
-        //Endereço Base
-        uint16_t base = tile_addr + (line * 2);
-
-        //Percorre as colunas dentro do tile
-        for(int j = 0; j < 8; j++)
-        {
-                //TODO:Melhorar, código pouco legível
-                if(j == 0)
-                {
-					tile_data[7-j] = (((*mem).read(base)&1))|(((*mem).read(base+1) & 1)<<1);
-				}
-				else
-                {
-					
-					tile_data[7-j] = (((*mem).read(base)&(1<<j))>>j)|(((*mem).read(base+1)&(1<<j))>>(j-1));
-				}
-        }
-
-
-
-        //if((this->getClk()%500) == 0)
-        //      std::cout << "Data: " << std::hex << data_addr << " Code: " << code_addr << std::endl;
-        //        std::cout << std::hex << (int)(*mem).read(LCDC) << std::endl;
-   
-}
-
-//Desenha todos os tiles no framebuffer
-void Ppu::drawnAllTiles()
-{
-
-        for(int i = 0; i < 0x20; i++)
-                for(int j = 0; j < 0x20; j++)
-                {
-                        this->drawnTile(i+(j*32),(i*8),(j*8)); 
-                }
-
-
-}
-
-void Ppu::drawnTile(uint16_t tile_num, uint8_t x, uint8_t y)
-{
-        //Secção da ram que guarda os códigos de tiles
-        //Verifica qual a Banco de códigos de tiles utilizado
-        //TODO:Substituir o No 0x08 por máscara p/ bit 3
-	uint16_t code_addr = ((*mem).read(LCDC) & 0x08) ? 0x9C00 : 0x9800;
-
-	//Secção da ram que guarda os dados dos tiles
-        //Verifica qual a Banco de dados de tiles utilizado
-        //TODO:Substituir o No 0x10 por máscara p/ bit 4
-	uint16_t data_addr = ((*mem).read(LCDC) & 0x10) ? 0x8000 : 0x8800;
-
-        //Endereço do tile
-        uint16_t tile_addr = data_addr + ((*mem).read(code_addr + tile_num)*16);
-
-        //Varivel para guardar o tile
-        uint8_t tile[8][8];
-
-        //Decodofica as linhas
-        for(int i = 0; i < 16; i+=2)
-        {
-
-                //Endereço Base
-                uint16_t base = tile_addr + i;
-
-                //Percorre as colunas dentro do tile
-                for(int j = 0; j < 8; j++)
-                        tile[i/2][7-j] = (((*mem)[base]&(1<<j))>>j)|(((*mem)[base+1]&(1<<j))>>(i-j));
-
-        }
-
-        /*
-        for(int x = 0; x < 8; x++)
-        {
-                for(int y = 0; y < 8; y++)
-                        std::cout << (int)tile[x][y] << " ";
-
-                std::cout << std::endl;
-
-        }
-
-        */
-        video.writeTileBuffer(tile,x,y,(*mem).read(BGP));
-
-}
 
 //Atualiza o estado da PPU
 void Ppu::update(uint8_t e_clk)
@@ -386,8 +377,13 @@ void Ppu::update(uint8_t e_clk)
                         
                         if(this->line < 144)
                         {
+                                //Desenha o background
                                 this->drawnLineBG();
-                                //this->drawnAllTiles();
+
+                                //Desenha a janela
+                                if (win_on) this->drawnLineWd();
+                                
+                                //Desenha os sprites
                                 this->drawnLineOB();
                         }
                         else if (this->line == 144)
