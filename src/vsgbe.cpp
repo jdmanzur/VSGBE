@@ -104,13 +104,6 @@ int main(int argc, char *argv[]) {
 	//Zera todos os botões 
 	ram[0xFF00] = 0xFF;
 
-	//Mundança manual do timer
-	//ram[0xFF05] = 0x00;
-
-	//cpu.reg_file.A() = 0x36;
-	//cpu.reg_file.F() = 0xFF;
-	//cpu.reg_file.HL() = 0x8A23;
-
 	uint8_t isnt_c = 0;
 
 	while(fim)
@@ -126,11 +119,12 @@ int main(int argc, char *argv[]) {
 
 
 		//cout << "PC: "<< hex << pc << 'h' <<" Intru: " << (int)ram[pc]  <<  endl;
-		//cout << "IE: " << hex << (int)ram[IE] << endl;
+		//cout << "LY: " << hex << (int)ram[LY] << endl;
 		//cout << "IME: " << hex << (int)cpu.IME << endl;
 
+/*
 		//Rotina para enganar o programa e dizer que os botões não estão apetados
-		if((cpu.reg_file.PC == 0x7ff3))
+		if((cpu.reg_file.PC == 0x200))
 		{
 			//Zera todos os botões 
 			//ram[0xFF80] = 0x00;
@@ -140,7 +134,7 @@ int main(int argc, char *argv[]) {
 			isnt_c++;
 
 		}	
-		
+*/
 
 		//Atualiza o clock da PPU
 		ppu.update(clk_e);
@@ -150,15 +144,6 @@ int main(int argc, char *argv[]) {
 
 		//Atualiza as entradas
 		entrada.UpdateAppUI();
-
-		
-
-		//Mundança manual do timer
-		//ram.write(0xFF05,(ram.read(0xFF05) + clk_e));
-		//ram.write(0xFF04,(ram.read(0xFF04) + cpu.getClkElapsed()));
-
-		//Zera todos os botões 
-		//ram[0xFF80] = 0x00;
 
 		//Verifica se o usuário desligou
 		fim = (!entrada.app_quit);

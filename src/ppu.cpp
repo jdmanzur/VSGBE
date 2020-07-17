@@ -68,11 +68,14 @@ void Ppu::drawnLineBG()
         //Linhas deslocadas dentro do tile pelo scroll y
         uint8_t inc_line_y = (scrolly & 0x07);
 
-        //No do primero sprite a ser desenhado
-        uint16_t n_tile = (((((int)this->line/8)*32) + ((int)inc_tile_y * 32) + inc_tile_x) & 0x03FF);
+        //No do primero tile a ser desenhado
+        uint16_t n_tile = (((((int)this->line/8)*32) + ((int)inc_tile_y * 32) + ((((this->line & 0x07) + inc_line_y)>>3)*32) + inc_tile_x) & 0x03FF);
 
         //No da linha dentro sprite
-        uint8_t sub_line = ((this->line) & 0x07);
+       uint8_t sub_line = (((this->line & 0x07) + inc_line_y) & 0x07);
+
+        //Linha de tiles para espelho horizontal
+        uint8_t tile_line = n_tile/32;
 
         //Variável para guardar a linha decodificada
         uint8_t tile_data[8];
@@ -82,44 +85,35 @@ void Ppu::drawnLineBG()
         for(int i = 0; i < 160; )
         {
 			
-				int c_start = 0;
-				int c_end = 7;
+		int c_start = 0;
+		int c_end = 7;
 			
                 //Tiles para desenhar
-                if(inc_colu_x)
-                {
-					if(i == 0)
-					{
-						c_start = inc_colu_x;
-					}
-					else if(i > 152)
-					{
-						c_end = (7- inc_colu_x);
-					}
-				}
-                
-				
-                
+                if(inc_colu_x &&(i == 0))
+        	        c_start = inc_colu_x;
+
+               
                 //Pega os dados do tile
                 this->GetTileLine((n_tile++),sub_line,tile_data);
                 
-                this->video.drawnTileLine(tile_data,(*mem).read(BGP),this->line,(i),c_start,c_end);
-                
-               i += ((c_end - c_start)+1);
+                //Desenha a linha do tile no framebuffer
+                this->video.drawnTileLine(tile_data,0,(*mem).read(BGP),this->line,(i),c_start,c_end);
+
+                //Verifica se atingiu o fim da tela
+                if((n_tile/32) > tile_line)
+                        n_tile = (tile_line * 32);
+
+                //Incrementa a coluna 
+                i += ((c_end - c_start)+1);
 
         }
-       // this->video.drawnTileLine(tile_data,(*mem)[BGP]);
 
-       //std::cout << "X: " << (int)scrollx << " Y: " << (int)scrolly  << std::endl;
-
-        //std::cout << "Sub Linha: " << (int)sub_line << std::endl;       
 }
 
 //Desenha uma linha do tile no buffer
 //TODO:Melhorar
 void Ppu::drawnLineOB()
 {
-
         //Tamanho dos sprites : 0=8x8, 1=8x16
         uint8_t ob_size = ((*mem).read(LCDC) & 0x04) ? 16 : 8;
 
@@ -144,6 +138,13 @@ void Ppu::drawnLineOB()
                 //Posição Y do sprite
                 uint8_t obj_y = ((*mem).read(OAMS + (i*4)) - 16);
 
+                //Endereço do sprite na OAM
+                uint16_t oam_addr = (OAMS + (i * 4));
+
+                //Palheta utilizada
+                uint8_t obj_pal = (((*mem).read(oam_addr + 3) & 0x10) >> 4) ? (*mem).read(OBP1) : (*mem).read(OBP0);
+                uint8_t pal_num = (((*mem).read(oam_addr + 3) & 0x10) >> 4) ? 2 : 1;
+
                 //Verifica se o sprite está no campo de visão na tela
                 if((obj_x < 160)&&(obj_y < 144)&&(this->line >= obj_y))
                         //Verifica se o sprite está contido na linha
@@ -157,7 +158,7 @@ void Ppu::drawnLineOB()
 
                                 //Desenha o sprite
                                 //TODO:Criar uma função que leva em conta a palheta
-                                video.drawnTileLine(obj_data,(*mem).read(OBP0),this->line,obj_x,0,7);
+                                video.drawnTileLine(obj_data,pal_num,obj_pal,this->line,obj_x,0,7);
                         }
    
 
@@ -392,8 +393,6 @@ void Ppu::update(uint8_t e_clk)
                         else if (this->line == 144)
                         {
                                 this->showScreen();
-                                //Gambiarra para passar pular a interrupção
-                               //(*mem)[0xFF85] = 0xFF;
                         }
                 }
 	

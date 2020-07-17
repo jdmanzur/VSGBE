@@ -60,13 +60,24 @@ private:
     uint32_t fps_lasttime;
     uint32_t fps_current;
     uint32_t fps_frames;
+    
+
+    //Constante para palheta
+/*
+    const uint32_t pal_c[3][4] = {{0x00CCCCCC,0x00888888,0x00555555,0x00000000},
+                                 {0x00CADC9F,0x008bac0f,0x00306230,0x00000000},
+                                 {0x00CADC9F,0x008bac0f,0x00306230,0x00000000}};
+*/
+    const uint32_t pal_c[3][4] = {{0x00EEEEEE,0x00D0C4A0,0x00FFCBC1,0x00000000},
+                                 {0x00FFFFFF,0x00DBFFD6,0x006EB5FF,0x00000000},
+                                 {0x00FFFFFF,0x00DCD3FF,0x00FF9CEE,0x00000000}};
 
 public:
 	//Construtor
  	Video(int width,int height);
 
     //Desenha uma linha na buffer
-    void drawnTileLine(uint8_t* tile_data, uint8_t bgp,uint8_t line,uint8_t col,uint8_t start,uint8_t end);
+    void drawnTileLine(uint8_t* tile_data,uint8_t tile_type,uint8_t bgp,uint8_t line,uint8_t col,uint8_t start,uint8_t end);
 
     //Escreve diretamente no buffer
     void writeTileBuffer(uint8_t data[8][8],uint16_t,uint16_t,uint8_t bgp);
