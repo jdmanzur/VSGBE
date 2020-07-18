@@ -29,15 +29,15 @@ freely, subject to the following restrictions:
 
 //Constantes para o tamanho da rom e da BIOS
 //TODO: Isso depois tem que ser mudado para suportar outros tamanhos
-#define BIOS_SIZE	0x0100
-#define ROM_SIZE	0x8000
+const int BIOS_SIZE	=	0x0100;
+const int ROM_SIZE	=	0x8000;
 
 //Tamanhos dos bancos de ROM e RAM
-#define ROM_BANK_SIZE	0x4000
-#define RAM_BANK_SIZE	0x2000
-#define RAM_LST_SIZE	0x0080
-#define ORAM_SIZE		0x00A0
-#define IORAM_SIZE		0x0200
+const int ROM_BANK_SIZE	=	0x4000;
+const int RAM_BANK_SIZE	=	0x2000;
+const int RAM_LST_SIZE	=	0x0080;
+const int ORAM_SIZE		=	0x00A0;
+const int IORAM_SIZE	=	0x0200;
 
 //Tipos de controladores de memória
 //MBC0 = Sem controlador, apenas ROM

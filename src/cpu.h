@@ -773,7 +773,7 @@ public:
 	//Opcodes - 0x40 a 0x75 e 0x77 a 0x7F
 	void ldr8r8(uint8_t* opcode);
 
-	//HALT - Pausa a CPU e espera por interrupção
+	//HALT - Pconst intusa a CPU e espera por interrupção
 	//Opcode - 0x76
 	void halt(uint8_t* opcode);
 
