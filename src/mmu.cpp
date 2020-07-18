@@ -179,6 +179,16 @@ void Mmu::write(uint16_t addr,uint8_t data)
 
             this->rom_sel = (bank - 1);
         }
+        else if(this->c_type == MBC3)
+        {
+            uint16_t bank = (data & 0x7F);
+
+            //O controlador não suporta o mapeamento do banco 0
+            if(bank == 0)
+                bank++;
+
+            this->rom_sel = (bank - 1);
+        }
 
 
     }
