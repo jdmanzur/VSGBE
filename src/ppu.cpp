@@ -53,8 +53,8 @@ Ppu::Ppu(Mmu* mem_s) : video(640,560)
 void Ppu::drawnLineBG()
 {
 	//Deslocamento horizontal e vertical para scroll
-        uint8_t scrollx = (*mem).read(SCX);
-        uint8_t scrolly = (*mem).read(SCY);
+        uint8_t scrollx = (*mem).read(AddrConst::SCX);
+        uint8_t scrolly = (*mem).read(AddrConst::SCY);
 
         //tiles deslocados em relação ao scroll y
         uint8_t inc_tile_y = ((scrolly & 0xF8) >> 3);
@@ -97,7 +97,7 @@ void Ppu::drawnLineBG()
                 this->GetTileLine((n_tile++),0,sub_line,tile_data);
                 
                 //Desenha a linha do tile no framebuffer
-                this->video.drawnTileLine(tile_data,0,(*mem).read(BGP),this->line,(i),c_start,c_end);
+                this->video.drawnTileLine(tile_data,0,(*mem).read(AddrConst::BGP),this->line,(i),c_start,c_end);
 
                 //Verifica se atingiu o fim da tela
                 if((n_tile/32) > tile_line)
@@ -120,15 +120,15 @@ void Ppu::GetTileLine(uint16_t tile_n,uint8_t type,uint8_t line,uint8_t* tile_da
 
         //Secção da ram que guarda os dados dos tiles
         //Verifica qual a Banco de dados de tiles utilizado
-        uint16_t data_addr = ((*mem).read(LCDC) & 0x10) ? 0x8000 : 0x9000;
+        uint16_t data_addr = ((*mem).read(AddrConst::LCDC) & 0x10) ? 0x8000 : 0x9000;
 
 
         //Tipo 0 : Background
         if(type == 0)
-                code_addr = ((*mem).read(LCDC) & 0x08) ? 0x9C00 : 0x9800;
+                code_addr = ((*mem).read(AddrConst::LCDC) & 0x08) ? 0x9C00 : 0x9800;
         //Tipo 1 : Janela
         else
-                code_addr = ((*mem).read(LCDC) & 0x40) ? 0x9C00 : 0x9800;
+                code_addr = ((*mem).read(AddrConst::LCDC) & 0x40) ? 0x9C00 : 0x9800;
 
 
         uint16_t tile_addr;
@@ -163,8 +163,8 @@ void Ppu::GetTileLine(uint16_t tile_n,uint8_t type,uint8_t line,uint8_t* tile_da
 void Ppu::drawnLineWd()
 {
         //Posição da janela na tela
-        int16_t pos_x = ((*mem).read(WX) - 7);
-        uint8_t pos_y = (*mem).read(WY);
+        int16_t pos_x = ((*mem).read(AddrConst::WX) - 7);
+        uint8_t pos_y = (*mem).read(AddrConst::WY);
 
         //Não aceitas No negativos
         if(pos_x < 0) pos_x = 0;
@@ -204,7 +204,7 @@ void Ppu::drawnLineWd()
                         this->GetTileLine((n_tile++),1,sub_line,tile_data);
                 
                         //Desenha a linha do tile no framebuffer
-                        this->video.drawnTileLine(tile_data,0,(*mem).read(BGP),this->line,i ,c_start,c_end);
+                        this->video.drawnTileLine(tile_data,0,(*mem).read(AddrConst::BGP),this->line,i ,c_start,c_end);
                         
                         //Incrementa a coluna 
                         i += ((c_end - c_start)+1);
@@ -222,7 +222,7 @@ void Ppu::drawnLineWd()
 void Ppu::drawnLineOB()
 {
         //Tamanho dos sprites : 0=8x8, 1=8x16
-        uint8_t ob_size = ((*mem).read(LCDC) & 0x04) ? 16 : 8;
+        uint8_t ob_size = ((*mem).read(AddrConst::LCDC) & 0x04) ? 16 : 8;
 
         //Número de sprites na linha atual
         uint8_t ob_num = 0;
@@ -240,16 +240,16 @@ void Ppu::drawnLineOB()
         while((i < 40) && (ob_num < 10))
         {
                 //Posição X do sprite
-                uint8_t obj_x = ((*mem).read(OAMS + (i*4) + 1) - 8);
+                uint8_t obj_x = ((*mem).read(AddrConst::OAMS + (i*4) + 1) - 8);
 
                 //Posição Y do sprite
-                uint8_t obj_y = ((*mem).read(OAMS + (i*4)) - 16);
+                uint8_t obj_y = ((*mem).read(AddrConst::OAMS + (i*4)) - 16);
 
                 //Endereço do sprite na OAM
-                uint16_t oam_addr = (OAMS + (i * 4));
+                uint16_t oam_addr = (AddrConst::OAMS + (i * 4));
 
                 //Palheta utilizada
-                uint8_t obj_pal = (((*mem).read(oam_addr + 3) & 0x10) >> 4) ? (*mem).read(OBP1) : (*mem).read(OBP0);
+                uint8_t obj_pal = (((*mem).read(oam_addr + 3) & 0x10) >> 4) ? (*mem).read(AddrConst::OBP1) : (*mem).read(AddrConst::OBP0);
                 uint8_t pal_num = (((*mem).read(oam_addr + 3) & 0x10) >> 4) ? 2 : 1;
 
                 //Verifica se o sprite está no campo de visão na tela
@@ -280,10 +280,10 @@ void Ppu::GetObjLine(uint8_t obj_n,uint8_t line,uint8_t* obj_data)
 {
 
         //Tamanho dos sprites : 0=8x8, 1=8x16
-        bool ob_size = ((*mem).read(LCDC) & 0x04) ? 1 : 0;
+        bool ob_size = ((*mem).read(AddrConst::LCDC) & 0x04) ? 1 : 0;
 
         //Endereço do sprite na OAM
-        uint16_t oam_addr = (OAMS + (obj_n * 4));
+        uint16_t oam_addr = (AddrConst::OAMS + (obj_n * 4));
 
         //Secção da ram que guarda os dados dos sprites
         //Verifica qual a Banco de dados de sprites utilizado
@@ -356,13 +356,13 @@ void Ppu::update(uint8_t e_clk)
 {
 	//Variveis do estado do controlador de vídeo
         //Flag para o background 
-        uint8_t bg_on = ((*mem).read(LCDC) & 0x01);
+        uint8_t bg_on = ((*mem).read(AddrConst::LCDC) & 0x01);
         //Flag para os sprites 
-        uint8_t ob_on = (((*mem).read(LCDC) & 0x02) >> 1);
+        uint8_t ob_on = (((*mem).read(AddrConst::LCDC) & 0x02) >> 1);
         //Flag para a janela 
-        uint8_t win_on = (((*mem).read(LCDC) & 0x20) >> 4);
+        uint8_t win_on = (((*mem).read(AddrConst::LCDC) & 0x20) >> 4);
         //Flag para o controlador de vídeo 
-        uint8_t lcd_on = (((*mem).read(LCDC) & 0x80) >> 6);
+        uint8_t lcd_on = (((*mem).read(AddrConst::LCDC) & 0x80) >> 6);
 
         //Atualiza o clock
 	this->incClk(e_clk);
@@ -402,16 +402,16 @@ void Ppu::update(uint8_t e_clk)
 	}
 
         //Atualiza  o registro contador de linhas
-        (*mem).write(LY,this->line);
+        (*mem).write(AddrConst::LY,this->line);
 
         //Atualiza os registros da PPU
         this->ModeUpdate();
 
         //Atualiza a Flag de LCY
-        if((*mem).read(LY) == (*mem).read(LYC))
-                (*mem).write(STAT,((*mem).read(STAT) | 0x04));
+        if((*mem).read(AddrConst::LY) == (*mem).read(AddrConst::LYC))
+                (*mem).write(AddrConst::STAT,((*mem).read(AddrConst::STAT) | 0x04));
         else
-                (*mem).write(STAT,((*mem).read(STAT) & 0xFB));   
+                (*mem).write(AddrConst::STAT,((*mem).read(AddrConst::STAT) & 0xFB));   
         
         
 }
@@ -420,7 +420,7 @@ void Ppu::update(uint8_t e_clk)
 void Ppu::showScreen()
 {
 	//Flag para o controlador de vídeo 
-        uint8_t lcd_on = (((*mem).read(LCDC) & 0x80) >> 6);
+        uint8_t lcd_on = (((*mem).read(AddrConst::LCDC) & 0x80) >> 6);
         
         //Atualiza o display
        // if(lcd_on)
@@ -467,19 +467,19 @@ void Ppu::ModeUpdate()
 
         //Verifica se interrupções habilitadas
         //Interrupção de V BLANK
-        bool v_blank_on = ((*mem).read(IE) & 0x01);
+        bool v_blank_on = ((*mem).read(AddrConst::IE) & 0x01);
         //Interrupção Selecionável LCDC
-        bool lcdc_on = ((*mem).read(IE) & 0x02);
+        bool lcdc_on = ((*mem).read(AddrConst::IE) & 0x02);
 
         //Interrupções do registro STAT
         //HBLANK - Começo do modo 0
-        bool stat3 = ((*mem).read(STAT) & 0x08);
+        bool stat3 = ((*mem).read(AddrConst::STAT) & 0x08);
         //VBLANK- Começo do modo 1 (adicional à INT 40)        
-        bool stat4 = ((*mem).read(STAT) & 0x10);
+        bool stat4 = ((*mem).read(AddrConst::STAT) & 0x10);
         //OAM - Início do modo 2 e modo 1        
-        bool stat5 = ((*mem).read(STAT) & 0x20);
+        bool stat5 = ((*mem).read(AddrConst::STAT) & 0x20);
         //LY=LYC       
-        bool stat6 = ((*mem).read(STAT) & 0x40);
+        bool stat6 = ((*mem).read(AddrConst::STAT) & 0x40);
 
 
         //Atualiza o estado da PPU
@@ -490,21 +490,21 @@ void Ppu::ModeUpdate()
                         this->mode_flag = OAM;
 
                         //Altera o modo na memória
-                        (*mem).write(STAT,(((*mem).read(STAT) & 0xFC) | 0x02));
+                        (*mem).write(AddrConst::STAT,(((*mem).read(AddrConst::STAT) & 0xFC) | 0x02));
                 }
                 else if((dot >= 80)&&(dot < 200))
                 {
                         this->mode_flag = RENDER;
 
                         //Altera o modo na memória
-                        (*mem).write(STAT,(((*mem).read(STAT) & 0xFC) | 0x03));
+                        (*mem).write(AddrConst::STAT,(((*mem).read(AddrConst::STAT) & 0xFC) | 0x03));
                 }
                 else if(dot >= 200)
                 {
                         this->mode_flag = HBLANK;
 
                         //Altera o modo na memória
-                        (*mem).write(STAT,(((*mem).read(STAT)& 0xFC)));
+                        (*mem).write(AddrConst::STAT,(((*mem).read(AddrConst::STAT)& 0xFC)));
                 }
         }
         else
@@ -512,7 +512,7 @@ void Ppu::ModeUpdate()
                 this->mode_flag = VBLANK;
 
                 //Altera o modo na memória
-                (*mem).write(STAT,(((*mem).read(STAT) & 0xFC) | 0x01));
+                (*mem).write(AddrConst::STAT,(((*mem).read(AddrConst::STAT) & 0xFC) | 0x01));
 
         }
 
@@ -521,7 +521,7 @@ void Ppu::ModeUpdate()
         {
                 //Verfica se a interrupção de V BLANK está ocorrendo
                 if(this->mode_flag == VBLANK)
-                        (*mem).write(IF,((*mem).read(IF) | 0x01));
+                        (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x01));
 
                 //Verifica as interrupções stat
                 else
@@ -530,28 +530,28 @@ void Ppu::ModeUpdate()
                         if(stat3 && (this->mode_flag == HBLANK))
                         {
                                 //Habilia a flag de interrupção
-                                (*mem).write(IF,((*mem).read(IF) | 0x02));
+                                (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x02));
 
                         }
                         //VBLANK- Começo do modo 1 (adicional à INT 40) 
                         else if(stat4 && (this->mode_flag == VBLANK))
                         {
                                 //Habilia a flag de interrupção
-                                (*mem).write(IF,((*mem).read(IF) | 0x02));
+                                (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x02));
 
                         }
                         //OAM - Início do modo 2 e modo 1   
                         else if(stat5 && ((this->mode_flag == OAM)||(this->mode_flag == VBLANK)))
                         {
                                 //Habilia a flag de interrupção
-                                (*mem).write(IF,((*mem).read(IF) | 0x02));
+                                (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x02));
 
                         }
                         //LY=LYC 
-                        else if (stat6 && ((*mem).read(LY) == (*mem).read(LYC)))
+                        else if (stat6 && ((*mem).read(AddrConst::LY) == (*mem).read(AddrConst::LYC)))
                         {
                                 //Habilia a flag de interrupção
-                                (*mem).write(IF,((*mem).read(IF) | 0x02));
+                                (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x02));
 
                         }
 

@@ -69,8 +69,8 @@ void SimpleZ80::Checkinterrupt()
 	//Verifica os bits de interrupção
 
 	//Variável temporária para interrupções
-	uint8_t temp_if = (*mem).read(IF);
-	uint8_t temp_ie = (*mem).read(IE);
+	uint8_t temp_if = (*mem).read(AddrConst::IF);
+	uint8_t temp_ie = (*mem).read(AddrConst::IE);
 
 	//V BLANK
 	bool vblank_if = (temp_if & 0x01);
@@ -111,7 +111,7 @@ void SimpleZ80::Checkinterrupt()
 		this->reg_file.PC = 0x0040;
 
 		//Desabilita a interrupção
-		(*mem).write(IF,((*mem).read(IF) & 0xFE));
+		(*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) & 0xFE));
 
 		//Religa a CPU
 		if(this->cpu_state == HALT)
@@ -127,7 +127,7 @@ void SimpleZ80::Checkinterrupt()
 		this->reg_file.PC = 0x48;
 
 		//Desabilita a interrupção
-		(*mem).write(IF,((*mem).read(IF) & 0xFD));
+		(*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) & 0xFD));
 
 
 	}else if(timer_if && timer_ie)
@@ -140,7 +140,7 @@ void SimpleZ80::Checkinterrupt()
 		this->reg_file.PC = 0x50;
 
 		//Desabilita a interrupção
-		(*mem).write(IF,((*mem).read(IF) & 0xFB));
+		(*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) & 0xFB));
 	
 	}else if(joy_if && joy_ie)
 	{
@@ -152,7 +152,7 @@ void SimpleZ80::Checkinterrupt()
 		this->reg_file.PC = 0x60;
 
 		//Desabilita a interrupção
-		(*mem).write(IF,((*mem).read(IF) & 0xEF));
+		(*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) & 0xEF));
 	}
 	
 
@@ -935,16 +935,16 @@ void SimpleZ80::halt(uint8_t* opcode)
 		//Atualiza o PC
 		this->reg_file.PC += 1;
 
-	}else if((!this->IME) && (!((*mem).read(IF) & (*mem).read(IE) & 0x1F)))
+	}else if((!this->IME) && (!((*mem).read(AddrConst::IF) & (*mem).read(AddrConst::IE) & 0x1F)))
 	{
 
 		//TODO: Verificar este valor
 		this->clk_elapsed = 4;
 
-		if((*mem).read(IF) & 0x1F)
+		if((*mem).read(AddrConst::IF) & 0x1F)
 			this->reg_file.PC += 1;
 
-	}else if((!this->IME) && ((*mem).read(IF) & (*mem).read(IE) & 0x1F))
+	}else if((!this->IME) && ((*mem).read(AddrConst::IF) & (*mem).read(AddrConst::IE) & 0x1F))
 	{
 		//TODO:Implementar corretamente este Bug
 

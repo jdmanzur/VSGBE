@@ -42,20 +42,20 @@ void Timer::update(uint8_t e_clk)
     this->div_reg += e_clk;
 
     //Atulaiza o registro DIV na memória de sistema
-    (*mem).write(DIV,(uint8_t)(div_reg >> 8));
+    (*mem).write(AddrConst::DIV,(uint8_t)(div_reg >> 8));
 
     //Váriavel se o timer está ligado
-    bool t_on = ((*mem).read(TAC) & 0x04) >> 2;
+    bool t_on = ((*mem).read(AddrConst::TAC) & 0x04) >> 2;
 
     //Seleção de frequência do clock
-    uint8_t f_sel = ((*mem).read(TAC) & 0x03);
+    uint8_t f_sel = ((*mem).read(AddrConst::TAC) & 0x03);
 
     //TODO:Verificar se o funcionamento do timer no hardware real é dessa maneira...
     //Verifica se o timer está ligado
     if(t_on)
     {
         //Valor anterior do timer
-        uint8_t t_old = (*mem).read(TIMA);
+        uint8_t t_old = (*mem).read(AddrConst::TIMA);
 
         //Tempo passado desde a última isntrução
         uint8_t delta_t = (e_clk + mod);
@@ -66,7 +66,7 @@ void Timer::update(uint8_t e_clk)
             //Freq / 2^4 (262.144 KHz)
 
             //Atualiza o timer
-            (*mem).write(TIMA,((delta_t/0x10) + t_old));
+            (*mem).write(AddrConst::TIMA,((delta_t/0x10) + t_old));
 
             //Atualiza o módulo
             this->mod = (delta_t%0x10);            
@@ -77,7 +77,7 @@ void Timer::update(uint8_t e_clk)
             //Freq / 2^6 (65.536 KHz)
                         
             //Atualiza o timer
-            (*mem).write(TIMA,((delta_t/0x40) + t_old));
+            (*mem).write(AddrConst::TIMA,((delta_t/0x40) + t_old));
 
             //Atualiza o módulo
             this->mod = (delta_t%0x40);  
@@ -88,7 +88,7 @@ void Timer::update(uint8_t e_clk)
             //Freq / 2^8 (16.384 KHz)
             
             //Atualiza o timer
-            (*mem).write(TIMA,((delta_t/0x100) + t_old));
+            (*mem).write(AddrConst::TIMA,((delta_t/0x100) + t_old));
 
             //Atualiza o módulo
             this->mod = (delta_t%0x100);  
@@ -99,7 +99,7 @@ void Timer::update(uint8_t e_clk)
             //Freq / 2^10 (4.096 KHz)
 
             //Atualiza o timer
-            (*mem).write(TIMA,((delta_t/0x400) + t_old));
+            (*mem).write(AddrConst::TIMA,((delta_t/0x400) + t_old));
 
             //Atualiza o módulo
             this->mod = (delta_t%0x400);  
@@ -108,13 +108,13 @@ void Timer::update(uint8_t e_clk)
         }
 
         //Verifica o overflow do timer
-        if(t_old > (*mem).read(TIMA))
+        if(t_old > (*mem).read(AddrConst::TIMA))
         {
             //Carrega o valor do timer
-            (*mem).write(TIMA,((*mem).read(TMA) + t_old));
+            (*mem).write(AddrConst::TIMA,((*mem).read(AddrConst::TMA) + t_old));
 
             //Habilita a interrupção
-            (*mem).write(IF,((*mem).read(IF) | 0x04));
+            (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x04));
         }
 
     }

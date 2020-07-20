@@ -109,44 +109,44 @@ uint8_t Mmu::read(uint16_t addr)
         return this->fst_page[addr];
     }
     //Banco #0 da ROM 
-    else if((addr >= BIOS_SIZE)&&(addr < ROMX))
+    else if((addr >= BIOS_SIZE)&&(addr < AddrConst::ROMX))
     {
         return this->f_rom[addr];
     }
     //Banco de ROM selecionável
-    else if((addr >= ROMX)&&(addr < VRAM))
+    else if((addr >= AddrConst::ROMX)&&(addr < AddrConst::VRAM))
     {
-        return this->b_rom[(addr - ROMX)+(this->rom_sel * ROM_BANK_SIZE)];
+        return this->b_rom[(addr - AddrConst::ROMX)+(this->rom_sel * ROM_BANK_SIZE)];
     }
     //Video RAM
-    else if ((addr >= VRAM)&&(addr < RAMX))
+    else if ((addr >= AddrConst::VRAM)&&(addr < AddrConst::RAMX))
     {
-        return this->v_ram[(addr - VRAM)];
+        return this->v_ram[(addr - AddrConst::VRAM)];
     }
     //Banco de RAM Externa selecionável
-    else if((addr >= RAMX)&&(addr < RAM0))
+    else if((addr >= AddrConst::RAMX)&&(addr < AddrConst::RAM0))
     {
 
         //Verfica se há RAM externa presente
         if(this->ram_size > 0)
-            return this->b_ram[(addr - RAMX) + (RAM_BANK_SIZE * ram_sel)];
+            return this->b_ram[(addr - AddrConst::RAMX) + (RAM_BANK_SIZE * ram_sel)];
 
         return 0;
     }
     //Banco 0 de RAM interna
-    else if((addr >= RAM0)&&(addr < ERAM))
+    else if((addr >= AddrConst::RAM0)&&(addr < AddrConst::ERAM))
     {
-        return this->i_ram0[(addr - RAM0)];
+        return this->i_ram0[(addr - AddrConst::RAM0)];
     }
     //Espelho da RAM interna
-    else if((addr >= ERAM)&&(addr < OAMS))
+    else if((addr >= AddrConst::ERAM)&&(addr < AddrConst::OAMS))
     {
-        return this->i_ram0[(addr - ERAM)];
+        return this->i_ram0[(addr - AddrConst::ERAM)];
     }
     //Memória de atributo de sprites
-    else if((addr >= OAMS)&&(addr < 0x10000))
+    else if((addr >= AddrConst::OAMS)&&(addr < 0x10000))
     {
-        return this->ioram[(addr - OAMS)];
+        return this->ioram[(addr - AddrConst::OAMS)];
     }
 
     return 0;
@@ -214,35 +214,35 @@ void Mmu::write(uint16_t addr,uint8_t data)
        
     }
     //Video RAM
-    else if ((addr >= VRAM)&&(addr < RAMX))
+    else if ((addr >= AddrConst::VRAM)&&(addr < AddrConst::RAMX))
     {
-        this->v_ram[(addr - VRAM)] = data;
+        this->v_ram[(addr - AddrConst::VRAM)] = data;
     }
     //Banco de RAM Externa selecionável
-    else if((addr >= RAMX)&&(addr < RAM0))
+    else if((addr >= AddrConst::RAMX)&&(addr < AddrConst::RAM0))
     {
         //Verfica se há RAM externa presente
         if(this->ram_size > 0)
-            this->b_ram[(addr - RAMX) + (RAM_BANK_SIZE * ram_sel)] =  data;
+            this->b_ram[(addr - AddrConst::RAMX) + (RAM_BANK_SIZE * ram_sel)] =  data;
 
     }
     //Banco 0 de RAM interna
-    else if((addr >= RAM0)&&(addr < ERAM))
+    else if((addr >= AddrConst::RAM0)&&(addr < AddrConst::ERAM))
     {
-        this->i_ram0[(addr - RAM0)] = data;
+        this->i_ram0[(addr - AddrConst::RAM0)] = data;
     }
     //Espelho da RAM interna
-    else if((addr >= ERAM)&&(addr < OAMS))
+    else if((addr >= AddrConst::ERAM)&&(addr < AddrConst::OAMS))
     {
-        this->i_ram0[(addr - ERAM)] = data;
+        this->i_ram0[(addr - AddrConst::ERAM)] = data;
     }
     //Memória de atributo de sprites e io
-    else if((addr >= OAMS)&&(addr < 0x10000))
+    else if((addr >= AddrConst::OAMS)&&(addr < 0x10000))
     {
-        this->ioram[(addr - OAMS)] = data;
+        this->ioram[(addr - AddrConst::OAMS)] = data;
 
         //Verifica se a escrita foi no dma
-        if(addr == DMA)
+        if(addr == AddrConst::DMA)
             //Chama o DMA
             this->dma();
 

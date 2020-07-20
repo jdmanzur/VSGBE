@@ -71,9 +71,9 @@ void InputCrt::UpdateAppUI()
 
     //verifica qual tecla está selecionada
     //Teclas Up, Down, Left e Right
-    bool p14 = ((*mem).read(P1) & 0x10) ? false : true;
+    bool p14 = ((*mem).read(AddrConst::P1) & 0x10) ? false : true;
     //Teclas A,B, Select e Start
-    bool p15 = ((*mem).read(P1) & 0x20) ? false : true;
+    bool p15 = ((*mem).read(AddrConst::P1) & 0x20) ? false : true;
 
     //Variável para guardar o estdo das teclas
     uint8_t k_read;
@@ -96,13 +96,13 @@ void InputCrt::UpdateAppUI()
         uint8_t k_read = ( p10 | p11 | p12 | p13);
 
         //Atualiza a memória
-        (*mem).write(P1,k_read + ((!p14) << 4) + ((!p15) << 5));
+        (*mem).write(AddrConst::P1,k_read + ((!p14) << 4) + ((!p15) << 5));
 
        //Verifica interrupção de acionamento das teclas
-       if(this->p14_old > (*mem).read(P1))
-            (*mem).write(IF,((*mem).read(IF) | 0x10));
+       if(this->p14_old > (*mem).read(AddrConst::P1))
+            (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x10));
 
-        this->p14_old = (*mem).read(P1);
+        this->p14_old = (*mem).read(AddrConst::P1);
               
     }
     else if(p15)
@@ -120,13 +120,13 @@ void InputCrt::UpdateAppUI()
         uint8_t k_read = ( p10 | p11 | p12 | p13);
 
         //Atualiza a memória
-        (*mem).write(P1,k_read + ((!p14) << 4) + ((!p15) << 5));
+        (*mem).write(AddrConst::P1,k_read + ((!p14) << 4) + ((!p15) << 5));
 
         //Verifica interrupção de acionamento das teclas
-       if(this->p15_old > (*mem).read(P1))
-            (*mem).write(IF,((*mem).read(IF) | 0x10));
+       if(this->p15_old > (*mem).read(AddrConst::P1))
+            (*mem).write(AddrConst::IF,((*mem).read(AddrConst::IF) | 0x10));
 
-        this->p15_old = (*mem).read(P1);
+        this->p15_old = (*mem).read(AddrConst::P1);
 
     }
 
