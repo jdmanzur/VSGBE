@@ -43,3 +43,6 @@ Para a compilação é necessário o compilador g++ e a biblioteca SDL na sua ve
 Controles
 
 Direcional : Teclas direcionais Botão A: Tecla A Botão B: Tecla S Start: Tecla X Mode: Tecla Z
+
+Capturas de Tela:
+
