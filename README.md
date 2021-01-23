@@ -46,7 +46,8 @@ Direcional : Teclas direcionais Botão A: Tecla A Botão B: Tecla S Start: Tecla
 
 Capturas de Tela:
 
+![image pokemon](./Pictures/pokemon.png)
 ![image Zelda](./Pictures/zelda.png)
 ![image Flappy](./Pictures/jogo.png)
 ![image tetris](./Pictures/tetris.png)
-
+![image contra](./Pictures/contra.png)
