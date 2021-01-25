@@ -34,7 +34,10 @@ Antes de mais nada, esse emulador é ruim, ou melhor dizendo, péssimo. Simples 
 # Público Alvo
 
 Qualquer um que intenda de C++ e queria mexer em um código de emulação para isso, o código está em licença z-lib, ou seja,
-pode ser utilizado para quais quer propósito. Da forma que está, este sofware não é um produto de produção, desta forma, se deseja apenas jogar um jogo sem se importar com detalhes técnicos, este emulador não é para você. Como já foi dito, este código é ruim e possuí todos os tipos de coisas erradas que um programa de computador pode ter entre eles, mas não limitado há: Estouro de pilha, exceções não tratadas, ponteiros selvagens e etc. Este programa não deve ser utilizado de maneira alguma em modo de super usuário (root), e o autor não se responsabiliza por quais quer dano ou perda de dado ou qualquer coisa de ruim que possa acontecer devido a utilização deste programa.
+pode ser utilizado para quais quer propósito. Da forma que está, este sofware não é um produto de produção, desta forma, se deseja apenas jogar um jogo sem se importar com detalhes técnicos, este emulador não é para você. 
+
+# Bugs Conhecidos
+Como já foi dito, este código é ruim e possuí todos os tipos de coisas erradas que um programa de computador pode ter entre eles, mas não limitado há: Estouro de pilha, exceções não tratadas, ponteiros selvagens e etc. Este programa não deve ser utilizado de maneira alguma em modo de super usuário (root), e o autor não se responsabiliza por quais quer dano ou perda de dado ou qualquer coisa de ruim que possa acontecer devido a utilização deste programa.
 
 # Compilação
 
@@ -42,9 +45,13 @@ Para a compilação é necessário o compilador g++ e a biblioteca SDL na sua ve
 
 # Controles
 
-Direcional : Teclas direcionais Botão A: Tecla A Botão B: Tecla S Start: Tecla X Mode: Tecla Z
+* Direcional : Teclas direcionais 
+* Botão A: Tecla A 
+* Botão B: Tecla S 
+* Start: Tecla X 
+* Mode: Tecla Z
 
-Capturas de Tela:
+# Capturas de Tela:
 
 ### **Pokémon**<br/>
 ![image pokemon](./Pictures/pokemon.png)><br/>
@@ -60,3 +67,6 @@ Capturas de Tela:
 
 ### **Contra**<br/>
 ![image contra](./Pictures/contra.png)<br/>
+
+# Autor
+- [Adriano Emidio](https://github.com/adrianoemidio)
